@@ -11,6 +11,7 @@
   (let [response-chan (chan)]
     (GET "http://hn.algolia.com/api/v1/search"
          {:params {"query" url
+                   "hitsPerPage" 1000
                    "restrictSearchableAttributes" "url"}
           :handler (fn [res] (go (>! response-chan res)))
           :error-handler (fn [err] (go (>! response-chan err)))})
@@ -18,5 +19,4 @@
 
 (let [current-url (-> js/window (.-location) (.-href))
       sub-chan (fetch-submission current-url)]
-  (go (println (<! sub-chan))))
-
+  (go (console.log (clj->js (<! sub-chan)))))
