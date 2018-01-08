@@ -2,10 +2,13 @@
 
 (enable-console-print!)
 
+(def browser-action (.-browserAction js/browser))
+
 (-> js/browser
     (.-runtime)
     (.-onMessage)
     (.addListener (fn [msg]
-                    (-> js/browser
-                        (.-browserAction)
-                        (.setBadgeText (.-numComments msg))))))
+                    (prn msg)
+                    (.setBadgeBackgroundColor browser-action #js {:color "#232323"})
+                    (.setBadgeText browser-action
+                                   #js {:text (str (.-numComments msg))}))))
