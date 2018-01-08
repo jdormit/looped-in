@@ -7,9 +7,6 @@
                  [org.clojure/clojurescript "1.9.946"]
                  [org.clojure/core.async "0.3.465"]
                  [cljs-ajax "0.7.3"]]
-  :plugins [[lein-cljsbuild "1.1.7"]]
-  :cljsbuild {:builds
-              [{:source-paths ["src"]
-                :compiler {:output-to "ext/main.js"
-                           :output-dir "out"
-                           :optimizations :whitespace}}]})
+  :source-paths ["src/build"]
+  :main looped-in.build
+  :aliases {"build" ["run"]})
