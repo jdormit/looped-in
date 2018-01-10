@@ -1,23 +1,11 @@
 (ns looped-in.content
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [ajax.core :refer [GET]]
-            [cljs.core.async :as async :refer [chan <! >!]]
-            [looped-in.logging :as log]))
+            [cljs.core.async :as async :refer [go <!]]
+            [looped-in.logging :as log]
+            [looped-in.promises :refer [promise->channel]]))
 
 (enable-console-print!)
-
-(defn fetch-submission
-  "Fetches submissions from Hacker News by `url`"
-  [url]
-  (let [response-chan (chan)]
-    (GET "https://hn.algolia.com/api/v1/search"
-         {:params {"query" url
-                   "hitsPerPage" 1000
-                   "restrictSearchableAttributes" "url"}
-          :handler (fn [res] (go (>! response-chan res)))
-          :error-handler (fn [err] (log/error "Error fetching HN stories:"
-                                          (clj->js err)))})
-    response-chan))
 
 (defn filter-response
   "Filters a response from hn.algolia.com to give just the relevant results"
@@ -47,9 +35,16 @@
         (.-runtime)
         (.sendMessage #js {:numComments num-comments}))))
 
-(let [current-url (-> js/window (.-location) (.-href))
+#_(let [current-url (-> js/window (.-location) (.-href))
       sub-chan (fetch-submission current-url)]
   (go (->> (<! sub-chan)
            (filter-response current-url)
            (sort-hits)
            (handle-hits))))
+
+(let [current-url (-> js/window (.-location) (.-href))
+      results-chan (-> js/browser
+                       (.-runtime)
+                       (.sendMessage #js {:type "fetchData" :url current-url})
+                       (promise->channel))]
+  (go (log/debug "results:" (<! results-chan))))

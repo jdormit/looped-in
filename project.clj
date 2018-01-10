@@ -6,7 +6,18 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.946"]
                  [org.clojure/core.async "0.3.465"]
+                 [org.clojure/core.match "0.3.0-alpha5"]
                  [cljs-ajax "0.7.3"]]
-  :source-paths ["src_clj"]
-  :main looped-in.build
-  :aliases {"build" ["run"]})
+  :plugins [[lein-cljsbuild "1.1.7"]]
+  :cljsbuild {:builds [{:source-paths ["src"]
+                        :compiler {:optimizations :simple
+                                   :source-map true
+                                   :pretty-print true
+                                   :output-dir "ext/js/generated/out"
+                                   :modules
+                                   {:content
+                                    {:output-to "ext/js/generated/content.js"
+                                     :entries #{"looped-in.content"}}
+                                    :background
+                                    {:output-to "ext/js/generated/background.js"
+                                     :entries #{"looped-in.background"}}}}}]})
