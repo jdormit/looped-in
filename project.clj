@@ -14,6 +14,7 @@
                                    :source-map true
                                    :pretty-print true
                                    :output-dir "ext/js/generated/out"
+                                   :language-in :es6
                                    :modules
                                    {:content
                                     {:output-to "ext/js/generated/content.js"
