@@ -9,7 +9,7 @@
   "Fetches submissions from Hacker News by `url`"
   [url]
   (let [response-chan (chan)]
-    (GET "http://hn.algolia.com/api/v1/search"
+    (GET "https://hn.algolia.com/api/v1/search"
          {:params {"query" url
                    "hitsPerPage" 1000
                    "restrictSearchableAttributes" "url"}
