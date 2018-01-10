@@ -16,6 +16,6 @@
     (-> p
         (.then (fn [result]
                  (go (>! channel result))))
-        (.err (fn [err]
+        (.catch (fn [err]
                 (log/error "Error resolving Promise:" err))))
     channel))
