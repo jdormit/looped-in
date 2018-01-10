@@ -14,16 +14,18 @@
             "matches": ["<all_urls>"],
             "js": [
                 "browser-polyfill.min.js",
+                "out/cljs_base.js",
                 "content.js"
             ]
         }
     ],
     "background": {
-        "scripts": ["browser-polyfill.min.js", "background.js"]
+        "scripts": ["browser-polyfill.min.js", "out/cljs_base.js", "background.js"]
     },
     "browser_action": {
         "default_icon": "icons/icon48.png",
         "default_title": "Looped In"
     },
-    "content_security_policy": "script-src 'self'; object-src 'self'; connect-src 'self' https://hn.algolia.com"
+    "content_security_policy": "script-src 'self'; object-src 'self'; connect-src 'self' https://hn.algolia.com",
+    "web_accessible_resources": ["*.map"]
 }

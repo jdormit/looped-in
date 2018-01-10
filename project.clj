@@ -7,6 +7,6 @@
                  [org.clojure/clojurescript "1.9.946"]
                  [org.clojure/core.async "0.3.465"]
                  [cljs-ajax "0.7.3"]]
-  :source-paths ["src/build"]
+  :source-paths ["src_clj"]
   :main looped-in.build
   :aliases {"build" ["run"]})
