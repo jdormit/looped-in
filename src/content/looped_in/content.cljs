@@ -14,7 +14,8 @@
                    "hitsPerPage" 1000
                    "restrictSearchableAttributes" "url"}
           :handler (fn [res] (go (>! response-chan res)))
-          :error-handler (fn [err] (go (>! response-chan err)))})
+          :error-handler (fn [err] (js/console.error "Error fetching HN stories:"
+                                                     (clj->js err)))})
     response-chan))
 
 (defn filter-response
