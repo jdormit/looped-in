@@ -9,6 +9,4 @@ pom.xml.asc
 /.nrepl-port
 .hgignore
 .hg/
-out/
-ext/content.js*
-ext/background.js*
+ext/js/generated/

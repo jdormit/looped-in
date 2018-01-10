@@ -5,8 +5,8 @@
   (cljs/build "src_cljs" {:optimizations :simple
                           :source-map true
                           :pretty-print true
-                          :output-dir "ext/out"
-                          :modules {:content {:output-to "ext/content.js"
+                          :output-dir "ext/js/generated/out"
+                          :modules {:content {:output-to "ext/js/generated/content.js"
                                               :entries #{"looped-in.content"}}
-                                    :background {:output-to "ext/background.js"
+                                    :background {:output-to "ext/js/generated/background.js"
                                                  :entries #{"looped-in.background"}}}}))
