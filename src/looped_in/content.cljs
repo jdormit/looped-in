@@ -45,6 +45,6 @@
 (let [current-url (-> js/window (.-location) (.-href))
       results-chan (-> js/browser
                        (.-runtime)
-                       (.sendMessage #js {:type "fetchData" :url current-url})
+                       (.sendMessage #js {:type "urlVisited" :url current-url})
                        (promise->channel))]
   (go (log/debug "results:" (<! results-chan))))

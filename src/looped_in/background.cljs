@@ -26,7 +26,7 @@
   "Handles messages from the content script"
   [msg]
   (match (.-type msg)
-         "fetchData" (channel->promise (fetch-submission (.-url msg)))
+         "urlVisited" (channel->promise (fetch-submission (.-url msg)))
          x (log/warn "Ignoring unknown message type" x)))
 
 (-> js/browser
