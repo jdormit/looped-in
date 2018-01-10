@@ -10,5 +10,5 @@ pom.xml.asc
 .hgignore
 .hg/
 out/
-ext/content.js
-ext/background.js
+ext/content.js*
+ext/background.js*
