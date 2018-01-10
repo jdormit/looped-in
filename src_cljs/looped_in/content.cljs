@@ -1,15 +1,10 @@
 (ns looped-in.content
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [ajax.core :refer [GET]]
-            [cljs.core.async :as async :refer [chan <! >!]]))
+            [cljs.core.async :as async :refer [chan <! >!]]
+            [looped-in.logging :as log]))
 
 (enable-console-print!)
-
-(defn log [& args]
-  (apply js/console.log "[Looped In]" args))
-
-(defn error [& args]
-  (apply js/console.error "[Looped In]" args))
 
 (defn fetch-submission
   "Fetches submissions from Hacker News by `url`"
@@ -20,7 +15,7 @@
                    "hitsPerPage" 1000
                    "restrictSearchableAttributes" "url"}
           :handler (fn [res] (go (>! response-chan res)))
-          :error-handler (fn [err] (error "Error fetching HN stories:"
+          :error-handler (fn [err] (log/error "Error fetching HN stories:"
                                           (clj->js err)))})
     response-chan))
 
@@ -30,7 +25,7 @@
   ;; request and this method for 5 minutes using localStorage
   [url response]
   (let [{:strs [hits]} response]
-    (log "response" response)
+    (log/debug "response" response)
     (filter #(= (get % "url") url) hits)))
 
 (defn sort-hits
@@ -46,7 +41,7 @@
 (defn handle-hits
   "Handles a filtered response"
   [hits]
-  (log (clj->js hits))
+  (log/debug (clj->js hits))
   (let [num-comments (total-num-comments hits)]
     (-> js/browser
         (.-runtime)
