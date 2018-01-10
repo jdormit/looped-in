@@ -26,6 +26,11 @@
   (let [{:strs [hits]} response]
     (filter #(= (get % "url") url) hits)))
 
+(defn sort-hits
+  "Sorts hits from hn.algolia.com by post date descending"
+  [hits]
+  (sort-by #(get % "created_at_i") #(compare %2 %1) hits))
+
 (defn total-num-comments
   "Returns the total number of comments from some hits"
   [hits]
@@ -42,4 +47,7 @@
 
 (let [current-url (-> js/window (.-location) (.-href))
       sub-chan (fetch-submission current-url)]
-  (go (handle-hits (filter-response current-url (<! sub-chan)))))
+  (go (->> (<! sub-chan)
+           (filter-response current-url)
+           (sort-hits)
+           (handle-hits))))
