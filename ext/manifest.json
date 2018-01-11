@@ -9,25 +9,16 @@
         "96": "icons/icon96.png",
         "128": "icons/icon128.png"
     },
-    "content_scripts": [
-        {
-            "matches": ["<all_urls>"],
-            "js": [
-                "js/browser-polyfill.min.js",
-                "js/generated/out/cljs_base.js",
-                "js/generated/content.js"
-            ]
-        }
-    ],
     "background": {
         "scripts": ["js/browser-polyfill.min.js",
                     "js/generated/out/cljs_base.js",
-                    "js/generated/background.js"]
+                    "js/generated/main.js"]
     },
     "browser_action": {
         "default_icon": "icons/icon48.png",
         "default_title": "Looped In"
     },
+    "permissions": ["tabs"],
     "content_security_policy": "script-src 'self'; object-src 'self'; connect-src 'self' https://hn.algolia.com",
     "web_accessible_resources": ["js/*.map", "js/generated/*.map"]
 }

@@ -14,11 +14,7 @@
                                    :source-map true
                                    :pretty-print true
                                    :output-dir "ext/js/generated/out"
-                                   :language-in :es6
                                    :modules
-                                   {:content
-                                    {:output-to "ext/js/generated/content.js"
-                                     :entries #{"looped-in.content"}}
-                                    :background
-                                    {:output-to "ext/js/generated/background.js"
-                                     :entries #{"looped-in.background"}}}}}]})
+                                   {:background
+                                    {:output-to "ext/js/generated/main.js"
+                                     :entries #{"looped-in.main"}}}}}]})
