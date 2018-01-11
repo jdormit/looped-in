@@ -11,10 +11,7 @@
   :plugins [[lein-cljsbuild "1.1.7"]]
   :cljsbuild {:builds [{:source-paths ["src"]
                         :compiler {:optimizations :simple
-                                   :source-map true
                                    :pretty-print true
-                                   :output-dir "ext/js/generated/out"
-                                   :modules
-                                   {:background
-                                    {:output-to "ext/js/generated/main.js"
-                                     :entries #{"looped-in.main"}}}}}]})
+                                   :output-to "ext/js/generated/main.js"
+                                   :source-map "ext/js/generated/main.js.map"
+                                   :output-dir "ext/js/generated/out"}}]})
