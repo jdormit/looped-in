@@ -34,7 +34,6 @@
 
 (defn fetch-items-for-hits [hits]
   (let [chans (map (fn [hit]
-                     (prn (hit "objectID"))
                      (fetch-item (hit "objectID")))
                    hits)]
     (go-loop [[channel & rest] chans
