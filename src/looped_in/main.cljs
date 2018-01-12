@@ -69,7 +69,7 @@
   (.setBadgeBackgroundColor (.-browserAction js/browser) #js {:color "#232323"})
   (.setBadgeText (.-browserAction js/browser) #js {:text text}))
 
-;; TODO implement a cache on the result of the urlVisited message
+;; TODO memoize handle-update, but with a 5-minute expiration
 
 (defn handle-update [tab-id]
   (go (let [url (-> js/browser
