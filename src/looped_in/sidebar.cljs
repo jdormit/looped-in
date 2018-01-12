@@ -20,13 +20,16 @@
                               author)
         $card (dom/createDom "div" #js {:class "card"} $text $author)]
     (if (> (count children) 0)
-      (let [$toggle (dom/createDom "div"
-                                   #js {:class "commentToggle"}
-                                   "<Toggle children>")
+      (let [$toggle (dom/createDom "img"
+                                   #js {:class "commentToggle"
+                                        :src "icons/arrowhead-down-16.svg"
+                                        :width "16px"
+                                        :height "16px"})
             $children (apply dom/createDom
                              "div"
                              #js {:class "commentChildren"}
                              (clj->js (map comment-dom children)))]
+        (log $toggle)
         (Zippy. $toggle $children)
         (dom/appendChild $card $toggle)
         (dom/createDom "div"
