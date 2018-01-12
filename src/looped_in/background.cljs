@@ -1,4 +1,4 @@
-(ns looped-in.main
+(ns looped-in.background
   (:require [clojure.core.match :refer [match]]
             [cljs.core.async :refer [go go-loop chan close! >! <!]]
             [ajax.core :refer [GET]]
@@ -103,5 +103,7 @@
 ;; 2. Fetch HN hits
 ;; 3. Filter and sort hits
 ;; 4. Count comments, update badge
-;; 5. Fetch item details
-;; 6. Construct popup (or sidebar?) html
+;; 5. When the popup is opened:
+;; 6. Fetch items based on the id (this will have to come
+;; from the background script to avoid repeating the request)
+;; 7. Render the popup

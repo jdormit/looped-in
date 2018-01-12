@@ -12,6 +12,11 @@
   :cljsbuild {:builds [{:source-paths ["src"]
                         :compiler {:optimizations :simple
                                    :pretty-print true
-                                   :output-to "ext/js/generated/main.js"
-                                   :source-map "ext/js/generated/main.js.map"
-                                   :output-dir "ext/js/generated/out"}}]})
+                                   :source-map true
+                                   :output-dir "ext/js/generated/out"
+                                   :modules {:background
+                                             {:output-to "ext/js/generated/background.js"
+                                              :entries #{"looped-in.background"}}
+                                             :popup
+                                             {:output-to "ext/js/generated/popup.js"
+                                              :entries #{"looped-in.popup"}}}}}]})
