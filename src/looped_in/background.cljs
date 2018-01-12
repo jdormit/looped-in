@@ -1,46 +1,14 @@
 (ns looped-in.background
   (:require [clojure.core.match :refer [match]]
-            [cljs.core.async :refer [go go-loop chan close! >! <!]]
+            [cljs.core.async :refer [go <!]]
             [ajax.core :refer [GET]]
+            [looped-in.hackernews :as hn]
             [looped-in.logging :as log]
             [looped-in.promises :refer [channel->promise promise->channel]]))
 
 (enable-console-print!)
 
-(defn fetch-submission
-  "Fetches submissions from Hacker News by `url`"
-  [url]
-  (let [response-chan (chan)]
-    (GET "https://hn.algolia.com/api/v1/search"
-         {:params {"query" url
-                   "hitsPerPage" 1000
-                   "restrictSearchableAttributes" "url"}
-          :handler (fn [res] (go (>! response-chan res)))
-          :error-handler (fn [err]
-                           (log/error (str "Error fetching HN stories for " url ":") err)
-                           (close! response-chan))})
-    response-chan))
-
-(defn fetch-item
-  "Fetches items from Hacker News by `id`"
-  [id]
-  (let [response-chan (chan)]
-    (GET (str "https://hn.algolia.com/api/v1/items/" id)
-         {:handler (fn [res] (go (>! response-chan res)))
-          :error-handler (fn [err]
-                           (log/error (str "Error fetching item " id ":") err)
-                           (close! response-chan))})
-    response-chan))
-
-(defn fetch-items-for-hits [hits]
-  (let [chans (map (fn [hit]
-                     (fetch-item (hit "objectID")))
-                   hits)]
-    (go-loop [[channel & rest] chans
-              acc []]
-      (if (nil? channel)
-        acc
-        (recur rest (conj acc (<! channel)))))))
+(def object-ids (atom []))
 
 (defn url-path
   "Returns a url without its protocol"
@@ -68,9 +36,7 @@
   (.setBadgeBackgroundColor (.-browserAction js/browser) #js {:color "#232323"})
   (.setBadgeText (.-browserAction js/browser) #js {:text text}))
 
-;; TODO memoize handle-update, but with a 5-minute expiration
-
-(defn handle-update [tab-id]
+(defn handle-tab-update [tab-id]
   (go (let [url (-> js/browser
                     (.-tabs)
                     (.query #js {:active true :currentWindow true})
@@ -79,24 +45,42 @@
                     (first)
                     (.-url))
             hits (-> url
-                     (fetch-submission)
+                     (hn/fetch-submission)
                      (<!)
                      (filter-response url)
                      (sort-hits))
-            items (<! (fetch-items-for-hits hits))
+            ids (map #(% "objectID") hits)
             num-comments (total-num-comments hits)]
-        (set-badge-text! (str num-comments))
-        (log/debug items))))
+        (reset! object-ids ids)
+        (set-badge-text! (str num-comments)))))
+
+(defn handle-message [msg]
+  (match (.-type msg)
+         "popupOpened" (channel->promise (go @object-ids))
+         x (log/error "Unknown popup message type" x)))
+
+(defn handle-browser-action [tab]
+  (-> js/browser (.-sidebarAction) (.open)))
 
 (-> js/browser
     (.-tabs)
     (.-onActivated)
-    (.addListener handle-update))
+    (.addListener handle-tab-update))
 
 (-> js/browser
     (.-tabs)
     (.-onUpdated)
-    (.addListener handle-update))
+    (.addListener handle-tab-update))
+
+(-> js/browser
+    (.-runtime)
+    (.-onMessage)
+    (.addListener handle-message))
+
+(-> js/browser
+    (.-browserAction)
+    (.-onClicked)
+    (.addListener handle-browser-action))
 
 ;; Application logic:
 ;; 1. Event comes in (new url)

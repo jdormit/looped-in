@@ -10,13 +10,13 @@
                  [cljs-ajax "0.7.3"]]
   :plugins [[lein-cljsbuild "1.1.7"]]
   :cljsbuild {:builds [{:source-paths ["src"]
-                        :compiler {:optimizations :simple
+                        :compiler {:optimizations :none
                                    :pretty-print true
                                    :source-map true
                                    :output-dir "ext/js/generated/out"
                                    :modules {:background
                                              {:output-to "ext/js/generated/background.js"
                                               :entries #{"looped-in.background"}}
-                                             :popup
-                                             {:output-to "ext/js/generated/popup.js"
-                                              :entries #{"looped-in.popup"}}}}}]})
+                                             :sidebar
+                                             {:output-to "ext/js/generated/sidebar.js"
+                                              :entries #{"looped-in.sidebar"}}}}}]})

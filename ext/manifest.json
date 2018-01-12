@@ -12,7 +12,8 @@
     "background": {
         "scripts": [
             "js/browser-polyfill.min.js",
-            "js/generated/out/cljs_base.js",
+            "js/generated/out/goog/base.js",
+            "js/generated/out/cljs_deps.js",
             "js/generated/background.js"
         ]
     },
@@ -20,7 +21,15 @@
         "default_icon": "icons/icon48.png",
         "default_title": "Looped In"
     },
+    "sidebar_action": {
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "48": "icons/icon48.png"
+        },
+        "default_title": "Looped In",
+        "default_panel": "sidebar.html"
+    },
     "permissions": ["tabs", "https://hn.algolia.com/*"],
-    "content_security_policy": "script-src 'self'; object-src 'self'; connect-src 'self' https://hn.algolia.com",
-    "web_accessible_resources": ["js/*.map", "js/generated/*.map"]
+    "content_security_policy": "script-src 'self' 'unsafe-eval' 'sha256-CfMPE8ys/ylJ5D9qKG0a9/UejrcczMr4/EmFCbVbgcc=' 'sha256-XsBu2nEJnS7x/Izq1v7dzy3Ze5myJMHvg4zukh/R1Yk=' 'sha256-AUCho1UyOpYFSZDg8EM9SYlysRIrUpQKZ7iE9CFSYfU=' 'sha256-vLlTaRFN8A2FPadIx711FwK9Ytd6LXkAzuEYAdC0D1k='; object-src 'self'; connect-src 'self' https://hn.algolia.com",
+    "web_accessible_resources": ["js/*.map", "js/generated/*.map", "js/generated/out/*"]
 }
