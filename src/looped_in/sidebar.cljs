@@ -13,11 +13,12 @@
 
 (defn comment-dom [{:strs [text author children]}]
   (let [$text (dom/createDom "div"
-                             #js {:class "commentText"}
+                             #js {:class "commentText body20"}
                              (dom/safeHtmlToNode (Sanitizer/sanitize text)))
         $author (dom/createDom "div"
                               #js {:class "commentAuthor"}
-                              author)]
+                              author)
+        $card (dom/createDom "div" #js {:class "card"} $text $author)]
     (if (> (count children) 0)
       (let [$toggle (dom/createDom "div"
                                    #js {:class "commentToggle"}
@@ -27,16 +28,14 @@
                              #js {:class "commentChildren"}
                              (clj->js (map comment-dom children)))]
         (Zippy. $toggle $children)
+        (dom/appendChild $card $toggle)
         (dom/createDom "div"
                        #js {:class "comment"}
-                       $text
-                       $author
-                       $toggle
+                       $card
                        $children))
       (dom/createDom "div"
                      #js {:class "comment"}
-                     $text
-                     $author))))
+                     $card))))
 
 (defn comments-dom [comments]
   (clj->js
@@ -47,7 +46,7 @@
 
 (defn story-dom [story]
   (let [$title (dom/createDom "div"
-                              #js {:class "storyTitle"}
+                              #js {:class "storyTitle title20 card"}
                               (story "title"))
         $comments (comments-dom (filter #(= "comment" (% "type")) (story "children")))]
     (Zippy. $title $comments)
