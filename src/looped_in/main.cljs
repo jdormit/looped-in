@@ -1,6 +1,6 @@
 (ns looped-in.main
   (:require [clojure.core.match :refer [match]]
-            [cljs.core.async :refer [go chan >! <!]]
+            [cljs.core.async :refer [go go-loop chan close! >! <!]]
             [ajax.core :refer [GET]]
             [looped-in.logging :as log]
             [looped-in.promises :refer [channel->promise promise->channel]]))
@@ -16,8 +16,9 @@
                    "hitsPerPage" 1000
                    "restrictSearchableAttributes" "url"}
           :handler (fn [res] (go (>! response-chan res)))
-          :error-handler (fn [err] (log/error "Error fetching HN stories:"
-                                              (clj->js err)))})
+          :error-handler (fn [err]
+                           (log/error (str "Error fetching HN stories for " url ":") err)
+                           (close! response-chan))})
     response-chan))
 
 (defn url-path [url]

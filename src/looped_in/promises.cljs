@@ -1,5 +1,5 @@
 (ns looped-in.promises
-  (:require [cljs.core.async :refer [go chan >! <!]]
+  (:require [cljs.core.async :refer [go chan close! >! <!]]
             [looped-in.logging :as log]))
 
 (defn channel->promise
@@ -17,5 +17,6 @@
         (.then (fn [result]
                  (go (>! channel result))))
         (.catch (fn [err]
-                (log/error "Error resolving Promise:" err))))
+                  (log/error "Error resolving Promise:" err)
+                  (close! channel))))
     channel))

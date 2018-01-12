@@ -16,7 +16,7 @@
         "default_icon": "icons/icon48.png",
         "default_title": "Looped In"
     },
-    "permissions": ["tabs"],
+    "permissions": ["tabs", "https://hn.algolia.com/*"],
     "content_security_policy": "script-src 'self'; object-src 'self'; connect-src 'self' https://hn.algolia.com",
     "web_accessible_resources": ["js/*.map", "js/generated/*.map"]
 }
