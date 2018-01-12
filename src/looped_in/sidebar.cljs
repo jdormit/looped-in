@@ -3,7 +3,8 @@
             [goog.html.sanitizer.HtmlSanitizer :as Sanitizer]
             [cljs.core.async :refer [go <!]]
             [looped-in.hackernews :as hn]
-            [looped-in.promises :refer [promise->channel]])
+            [looped-in.promises :refer [promise->channel]]
+            [looped-in.logging :as log])
   (:import (goog.ui Zippy)))
 
 (defn log [& args]
@@ -62,12 +63,19 @@
     (log items)
     (dom/append $storiesContainer $stories)))
 
-(go (-> js/browser
-        (.-runtime)
-        (.sendMessage #js {:type "popupOpened"})
-        (promise->channel)
-        (<!)
-        (hn/fetch-items)
-        (<!)
-        ((fn [items] (filter #(not (nil? %)) items)))
-        (render-items)))
+(defn fetch-and-render-items [ids]
+  (go (-> ids
+          (hn/fetch-items)
+          (<!)
+          ((fn [items] (filter #(not (nil? %)) items)))
+          (render-items))))
+
+(defn handle-message [msg]
+  (case (.-type msg)
+    "objectIds" (fetch-and-render-items (.-ids msg))
+    (log/error (str "Unknown message type " (.-type msg)))))
+
+(-> js/browser
+    (.-runtime)
+    (.-onMessage)
+    (.addListener handle-message))

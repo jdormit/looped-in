@@ -1,6 +1,5 @@
 (ns looped-in.background
-  (:require [clojure.core.match :refer [match]]
-            [cljs.core.async :refer [go <!]]
+  (:require [cljs.core.async :refer [go <!]]
             [ajax.core :refer [GET]]
             [looped-in.hackernews :as hn]
             [looped-in.logging :as log]
@@ -52,12 +51,11 @@
             ids (map #(% "objectID") hits)
             num-comments (total-num-comments hits)]
         (reset! object-ids ids)
+        (-> js/browser
+            (.-runtime)
+            (.sendMessage (clj->js {:type "objectIds"
+                                    :ids @object-ids})))
         (set-badge-text! (str num-comments)))))
-
-(defn handle-message [msg]
-  (match (.-type msg)
-         "popupOpened" (channel->promise (go @object-ids))
-         x (log/error "Unknown popup message type" x)))
 
 (defn handle-browser-action [tab]
   (-> js/browser (.-sidebarAction) (.open)))
@@ -71,11 +69,6 @@
     (.-tabs)
     (.-onUpdated)
     (.addListener handle-tab-update))
-
-(-> js/browser
-    (.-runtime)
-    (.-onMessage)
-    (.addListener handle-message))
 
 (-> js/browser
     (.-browserAction)
