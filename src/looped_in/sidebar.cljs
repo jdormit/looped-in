@@ -59,6 +59,7 @@
                    $comments)))
 
 (defn render-items [items]
+  (dom/removeChildren (dom/getElement "storiesContainer"))
   (let [stories (filter #(= "story" (% "type")) items)
         $stories (clj->js (map story-dom stories))
         $storiesContainer (dom/getElement "storiesContainer")]
