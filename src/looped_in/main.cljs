@@ -21,13 +21,37 @@
                            (close! response-chan))})
     response-chan))
 
-(defn url-path [url]
+(defn fetch-item
+  "Fetches items from Hacker News by `id`"
+  [id]
+  (let [response-chan (chan)]
+    (GET (str "https://hn.algolia.com/api/v1/items/" id)
+         {:handler (fn [res] (go (>! response-chan res)))
+          :error-handler (fn [err]
+                           (log/error (str "Error fetching item " id ":") err)
+                           (close! response-chan))})
+    response-chan))
+
+(defn fetch-items-for-hits [hits]
+  (let [chans (map (fn [hit]
+                     (prn (hit "objectID"))
+                     (fetch-item (hit "objectID")))
+                   hits)]
+    (go-loop [[channel & rest] chans
+              acc []]
+      (if (nil? channel)
+        acc
+        (recur rest (conj acc (<! channel)))))))
+
+(defn url-path
+  "Returns a url without its protocol"
+  [url]
   (when (not (nil? url))
     (second (re-matches #"http.*://(.*)" url))))
 
 (defn filter-response
   "Filters a response from hn.algolia.com to give just the relevant results"
-  [url response]
+  [response url]
   (let [{:strs [hits]} response]
     (filter #(= (url-path (get % "url")) (url-path url)) hits)))
 
@@ -48,18 +72,22 @@
 ;; TODO implement a cache on the result of the urlVisited message
 
 (defn handle-update [tab-id]
-  (go (let [query-p (-> js/browser (.-tabs) (.query #js {:active true
-                                                      :currentWindow true}))
-            query-chan (promise->channel query-p)
-            tab (first (<! query-chan))
-            url (.-url tab)
-            fetch-chan (fetch-submission url)
-            response (<! fetch-chan)
-            hits (->> response
-                      (filter-response url)
-                      (sort-hits))
+  (go (let [url (-> js/browser
+                    (.-tabs)
+                    (.query #js {:active true :currentWindow true})
+                    (promise->channel)
+                    (<!)
+                    (first)
+                    (.-url))
+            hits (-> url
+                     (fetch-submission)
+                     (<!)
+                     (filter-response url)
+                     (sort-hits))
+            items (<! (fetch-items-for-hits hits))
             num-comments (total-num-comments hits)]
-        (set-badge-text! (str num-comments)))))
+        (set-badge-text! (str num-comments))
+        (log/debug items))))
 
 (-> js/browser
     (.-tabs)
