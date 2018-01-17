@@ -58,7 +58,16 @@
         (set-badge-text! (str num-comments)))))
 
 (defn handle-browser-action [tab]
-  (-> js/browser (.-sidebarAction) (.open)))
+  (-> js/browser
+      (.-tabs)
+      (.sendMessage (.-id tab)
+                    (clj->js {:type "openSidebar"
+                              :ids @object-ids}))))
+
+(defn handle-message [msg sender respond]
+  (case (.-type msg)
+    "fetchItems" (channel->promise
+                  (go (clj->js (<! (hn/fetch-items @object-ids)))))))
 
 (-> js/browser
     (.-tabs)
@@ -74,6 +83,11 @@
     (.-browserAction)
     (.-onClicked)
     (.addListener handle-browser-action))
+
+(-> js/browser
+    (.-runtime)
+    (.-onMessage)
+    (.addListener handle-message))
 
 ;; Application logic:
 ;; 1. Event comes in (new url)

@@ -7,12 +7,13 @@
             [looped-in.logging :as log])
   (:import (goog.ui Zippy)))
 
-(defn log [& args]
-  (let [bg (-> js/browser (.-extension) (.getBackgroundPage))]
-    (apply (-> bg (.-console) (.-log)) "[Looped In]" (map clj->js args))))
+(enable-console-print!)
 
-(defn comment-dom [{:strs [text author children]}]
-  (let [$text (dom/createDom "div"
+(defn comment-dom [comment]
+  (let [text (.-text comment)
+        author (.-author comment)
+        children (array-seq (.-children comment))
+        $text (dom/createDom "div"
                              #js {:class "commentText body20"}
                              (dom/safeHtmlToNode (Sanitizer/sanitize text)))
         $author (dom/createDom "div"
@@ -29,7 +30,6 @@
                              "div"
                              #js {:class "commentChildren"}
                              (clj->js (map comment-dom children)))]
-        (log $toggle)
         (Zippy. $toggle $children)
         (dom/appendChild $card $toggle)
         (dom/createDom "div"
@@ -50,8 +50,8 @@
 (defn story-dom [story]
   (let [$title (dom/createDom "div"
                               #js {:class "storyTitle title20 card"}
-                              (story "title"))
-        $comments (comments-dom (filter #(= "comment" (% "type")) (story "children")))]
+                              (.-title story))
+        $comments (comments-dom (filter #(= "comment" (.-type %)) (array-seq (.-children story))))]
     (Zippy. $title $comments)
     (dom/createDom "div"
                    #js {:class "story"}
@@ -60,25 +60,16 @@
 
 (defn render-items [items]
   (dom/removeChildren (dom/getElement "storiesContainer"))
-  (let [stories (filter #(= "story" (% "type")) items)
+  (let [stories (filter #(= "story" (.-type %)) items)
         $stories (clj->js (map story-dom stories))
         $storiesContainer (dom/getElement "storiesContainer")]
-    (log items)
     (dom/append $storiesContainer $stories)))
 
-(defn fetch-and-render-items [ids]
-  (go (-> ids
-          (hn/fetch-items)
-          (<!)
-          ((fn [items] (filter #(not (nil? %)) items)))
-          (render-items))))
-
-(defn handle-message [msg]
-  (case (.-type msg)
-    "objectIds" (fetch-and-render-items (.-ids msg))
-    (log/error (str "Unknown message type " (.-type msg)))))
-
-(-> js/browser
-    (.-runtime)
-    (.-onMessage)
-    (.addListener handle-message))
+(go (-> js/browser
+        (.-runtime)
+        (.sendMessage (clj->js {:type "fetchItems"}))
+        (promise->channel)
+        (<!)
+        (array-seq)
+        ((fn [items] (filter #(not (nil? %)) items)))
+        (render-items)))
