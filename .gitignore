@@ -10,3 +10,4 @@ pom.xml.asc
 .hgignore
 .hg/
 ext/js/generated/
+.cljs_rhino_repl
