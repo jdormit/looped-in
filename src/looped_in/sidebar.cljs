@@ -80,10 +80,10 @@
   "Renders the new DOM
 
   This is where clever diffing algorithms would go if this was React"
-  [sidebar-dom]
+  [$sidebar-dom]
   (let [$container (dom/getElement "sidebarContent")]
     (dom/removeChildren $container)
-    (dom/append $container)))
+    (apply dom/append $container $sidebar-dom)))
 
 (defn main
   "Runs the model-update-view loop"
