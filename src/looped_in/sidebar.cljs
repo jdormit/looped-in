@@ -59,15 +59,41 @@
                    $title
                    $comments)))
 
-(defn render-items [items]
-  #_(dom/removeChildren (dom/getElement "sidebarContent"))
-  #_(let [stories (filter #(= "story" (.-type %)) items)
-        $stories (clj->js (map story-dom stories))
-        $storiesContainer (dom/getElement "sidebarContent")]
-    (dom/append $storiesContainer $stories)))
+(defn model
+  "Returns initial sidebar state"
+  []
+  {:items ()})
 
-(defn handle-close-button [e]
-  (.postMessage js/window.parent (clj->js {:type "closeSidebar"}) "*"))
+(defn update
+  "Given a message and the old state, returns the new state"
+  [msg state]
+  (case (:type msg)
+    :items (assoc state :items (:items msg))
+    state))
+
+(defn view
+  "Given a callback to dispatch an update message and the sidebar state, returns the sidebar DOM"
+  [dispatch-message state]
+  ())
+
+(defn render
+  "Renders the new DOM
+
+  This is where clever diffing algorithms would go if this was React"
+  [sidebar-dom]
+  (let [$container (dom/getElement "sidebarContent")]
+    (dom/removeChildren $container)
+    (dom/append $container)))
+
+(defn main
+  "Runs the model-update-view loop"
+  [state]
+  (let [dispatch-message (fn [msg]
+                           (let [new-state (update msg state)]
+                             (main new-state)))]
+    (render (view dispatch-message state))))
+
+(main (model))
 
 (go (-> js/browser
         (.-runtime)
@@ -76,6 +102,11 @@
         (<!)
         (array-seq)
         ((fn [items] (filter #(not (nil? %)) items)))
-        (render-items)))
+        (#(update {:type :items
+                   :items %} (model)))
+        (main)))
+
+(defn handle-close-button [e]
+  (.postMessage js/window.parent (clj->js {:type "closeSidebar"}) "*"))
 
 (events/listen (dom/getElement "closeSidebar") "click" handle-close-button)
