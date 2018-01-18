@@ -252,10 +252,13 @@ html, body {
 }
 
 .card {
+    background-color: #f9f9fa;
+    width: 90%;
+    margin: auto;
+    margin-top: 8px;
     padding: 8px;
-    border-bottom: 1px solid #d7d7db;
     display: flex;
-    align-items: center;
+    box-shadow: 0 1px 4px rgba(12, 12, 13, 0.1);
 }
 
 .title30 {
