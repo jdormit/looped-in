@@ -16,6 +16,7 @@
                                      :height "100%"
                                      :border 0
                                      :borderRight "2px solid #d7d7db"
+                                     :zIndex 9999
                                      :width (str sidebar-width "px")
                                      :top 0
                                      :left 0})})))
@@ -27,7 +28,7 @@
         $body js/document.body
         $sidebar (sidebar-dom)]
     (reset! old-html-padding (-> $html (.-style) (.-paddingLeft)))
-    (set! (-> $html (.-style) (.-paddingLeft)) (str sidebar-width "px"))
+    (set! (-> $html (.-style) (.-paddingLeft)) (str (+ sidebar-width 12) "px"))
     (dom/appendChild $body $sidebar)))
 
 (defn close-sidebar []

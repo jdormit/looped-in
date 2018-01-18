@@ -247,6 +247,10 @@ html, body {
     flex: 1 0 auto;
 }
 
+.headerIcon {
+    margin-right: 4px;
+}
+
 .card {
     padding: 8px;
     border-bottom: 1px solid #d7d7db;
