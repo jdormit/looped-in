@@ -64,7 +64,7 @@
   []
   {:items ()})
 
-(defn update
+(defn update-state
   "Given a message and the old state, returns the new state"
   [msg state]
   (case (:type msg)
@@ -89,11 +89,20 @@
   "Runs the model-update-view loop"
   [state]
   (let [dispatch-message (fn [msg]
-                           (let [new-state (update msg state)]
+                           (let [new-state (update-state msg state)]
                              (main new-state)))]
     (render (view dispatch-message state))))
 
 (main (model))
+
+(defn obj->clj [obj]
+  (into {} (for [k (.keys js/Object obj)]
+             [(keyword k)
+              (let [v (aget obj k)]
+                (cond
+                  (object? v) (obj->clj v)
+                  (.isArray js/Array v) (map obj->clj (array-seq v))
+                  :default (js->clj v)))])))
 
 (go (-> js/browser
         (.-runtime)
@@ -102,8 +111,8 @@
         (<!)
         (array-seq)
         ((fn [items] (filter #(not (nil? %)) items)))
-        (#(update {:type :items
-                   :items %} (model)))
+        (#(update-state {:type :items
+                   :items (map obj->clj %)} (model)))
         (main)))
 
 (defn handle-close-button [e]
