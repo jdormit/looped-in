@@ -61,8 +61,7 @@
   (-> js/browser
       (.-tabs)
       (.sendMessage (.-id tab)
-                    (clj->js {:type "openSidebar"
-                              :ids @object-ids}))))
+                    (clj->js {:type "openSidebar"}))))
 
 (defn handle-message [msg sender respond]
   (case (.-type msg)
