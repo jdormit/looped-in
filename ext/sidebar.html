@@ -5,12 +5,17 @@
         <link rel="stylesheet" href="css/sidebar.css">
         <script src="js/browser-polyfill.min.js"></script>
         <script src="js/generated/out/cljs_base.js"></script>
-        <script src="js/generated/sidebar.js"></script>
     </head>
     <body>
-        <div class="sidebar">
-            <div class="card title30">Hacker News Conversation</div>
-            <div class="storiesContainer" id="storiesContainer"></div>
+        <div id="sidebar">
+            <div class="sidebarHeader">
+            <span class="body30 headerTitle">Looped In</span>
+            <button class="iconButton" id="closeSidebar">
+                <img src="icons/stop-16.svg" width="16px" height="16px">
+            </button>
+            </div>
+            <div id="sidebarContent"></div>
         </div>
+        <script src="js/generated/sidebar.js"></script>
     </body>
 </html>

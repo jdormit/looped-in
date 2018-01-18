@@ -224,6 +224,29 @@
     color: #0c0c0d;
 }
 
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#sidebar {
+    height: 100%;
+    background-color: #ededf0;
+    box-sizing: border-box;
+}
+
+.sidebarHeader {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 2px solid #d7d7db;
+}
+
+.headerTitle {
+    flex: 1 0 auto;
+}
+
 .card {
     padding: 8px;
     border-bottom: 1px solid #d7d7db;
@@ -244,4 +267,23 @@
 .body20 {
     font-size: 15px;
     font-weight: 400;
+}
+
+.body30 {
+    font-size: 17px;
+    font-weight: 400;
+}
+
+.iconButton {
+    background-color: inherit;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    margin: 0;
+}
+
+.iconButton:hover {
+    background-color: #d7d7db;
 }

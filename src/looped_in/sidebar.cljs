@@ -1,5 +1,6 @@
 (ns looped-in.sidebar
   (:require [goog.dom :as dom]
+            [goog.events :as events]
             [goog.html.sanitizer.HtmlSanitizer :as Sanitizer]
             [cljs.core.async :refer [go <!]]
             [looped-in.hackernews :as hn]
@@ -59,11 +60,14 @@
                    $comments)))
 
 (defn render-items [items]
-  (dom/removeChildren (dom/getElement "storiesContainer"))
-  (let [stories (filter #(= "story" (.-type %)) items)
+  #_(dom/removeChildren (dom/getElement "sidebarContent"))
+  #_(let [stories (filter #(= "story" (.-type %)) items)
         $stories (clj->js (map story-dom stories))
-        $storiesContainer (dom/getElement "storiesContainer")]
+        $storiesContainer (dom/getElement "sidebarContent")]
     (dom/append $storiesContainer $stories)))
+
+(defn handle-close-button [e]
+  (.postMessage js/window.parent (clj->js {:type "closeSidebar"}) "*"))
 
 (go (-> js/browser
         (.-runtime)
@@ -73,3 +77,5 @@
         (array-seq)
         ((fn [items] (filter #(not (nil? %)) items)))
         (render-items)))
+
+(events/listen (dom/getElement "closeSidebar") "click" handle-close-button)
