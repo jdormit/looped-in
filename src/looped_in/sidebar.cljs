@@ -4,8 +4,10 @@
             [goog.html.sanitizer.HtmlSanitizer :as Sanitizer]
             [cljs.core.async :refer [go <!]]
             [looped-in.hackernews :as hn]
+            [looped-in.components :as components]
             [looped-in.promises :refer [promise->channel]]
             [looped-in.logging :as log])
+  (:require-macros [looped-in.macros :refer [get-in-items]])
   (:import (goog.ui Zippy)))
 
 (enable-console-print!)
@@ -62,19 +64,28 @@
 (defn model
   "Returns initial sidebar state"
   []
-  {:items ()})
+  {:items ()
+   :depth []
+   :loading false})
 
 (defn update-state
   "Given a message and the old state, returns the new state"
   [msg state]
   (case (:type msg)
     :items (assoc state :items (:items msg))
+    :loading (assoc state :loading (:loading msg))
     state))
 
 (defn view
   "Given a callback to dispatch an update message and the sidebar state, returns the sidebar DOM"
   [dispatch-message state]
-  ())
+  (log/debug state)
+  (if (:loading state)
+    "Loading..."
+    (let [current-item (get-in-items (:items state) (:depth state))]
+      (if (> (count current-item) 1)
+        (map #(components/card (:title %)) current-item)
+        ()))))
 
 (defn render
   "Renders the new DOM
@@ -85,15 +96,13 @@
     (dom/removeChildren $container)
     (apply dom/append $container $sidebar-dom)))
 
-(defn main
+(defn run-render-loop
   "Runs the model-update-view loop"
   [state]
   (let [dispatch-message (fn [msg]
                            (let [new-state (update-state msg state)]
-                             (main new-state)))]
+                             (run-render-loop new-state)))]
     (render (view dispatch-message state))))
-
-(main (model))
 
 (defn obj->clj [obj]
   (into {} (for [k (.keys js/Object obj)]
@@ -104,18 +113,34 @@
                   (.isArray js/Array v) (map obj->clj (array-seq v))
                   :default (js->clj v)))])))
 
-(go (-> js/browser
-        (.-runtime)
-        (.sendMessage (clj->js {:type "fetchItems"}))
-        (promise->channel)
-        (<!)
-        (array-seq)
-        ((fn [items] (filter #(not (nil? %)) items)))
-        (#(update-state {:type :items
-                   :items (map obj->clj %)} (model)))
-        (main)))
-
 (defn handle-close-button [e]
   (.postMessage js/window.parent (clj->js {:type "closeSidebar"}) "*"))
 
-(events/listen (dom/getElement "closeSidebar") "click" handle-close-button)
+(defn fetch-items
+  "Fetch items matching the URL"
+  []
+  (go (-> js/browser
+          (.-runtime)
+          (.sendMessage (clj->js {:type "fetchItems"}))
+          (promise->channel)
+          (<!)
+          (array-seq)
+          ((fn [items] (filter #(not (nil? %)) items)))
+          ((fn [items] (map obj->clj items)))
+          ((fn [items] (sort-by :points #(compare %2 %1) items))))))
+
+(defn init
+  "Initializes the sidebar"
+  []
+  (events/listen (dom/getElement "closeSidebar") "click" handle-close-button)
+  (let [initial-state (update-state {:type :loading :loading true} (model))]
+    (run-render-loop initial-state)
+    (go (-> (fetch-items)
+            (<!)
+            (#(update-state {:type :items
+                             :items %} initial-state))
+            (#(update-state {:type :loading
+                             :loading false} %))
+            (run-render-loop)))))
+
+(init)
