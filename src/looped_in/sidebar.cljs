@@ -81,8 +81,8 @@
   [dispatch-message state]
   (log/debug state)
   (if (:loading state)
-    "Loading..."
     (let [current-item (get-in-items (:items state) (:depth state))]
+    (components/loader)
       (if (> (count current-item) 1)
         (map #(components/card (:title %)) current-item)
         ()))))
