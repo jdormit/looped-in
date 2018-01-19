@@ -65,6 +65,7 @@
   "Returns initial sidebar state"
   []
   {:items ()
+   :hits ()
    :depth []
    :loading false})
 
@@ -73,6 +74,7 @@
   [msg state]
   (case (:type msg)
     :items (assoc state :items (:items msg))
+    :hits (assoc state :hits (:hits msg))
     :loading (assoc state :loading (:loading msg))
     state))
 
@@ -81,8 +83,9 @@
   [dispatch-message state]
   (log/debug state)
   (if (:loading state)
-    (let [current-item (get-in-items (:items state) (:depth state))]
     (components/loader)
+    (map #(components/card (:title %)) (:hits state))
+    #_(let [current-item (get-in-items (:items state) (:depth state))]
       (if (> (count current-item) 1)
         (map #(components/card (:title %)) current-item)
         ()))))
@@ -94,7 +97,9 @@
   [$sidebar-dom]
   (let [$container (dom/getElement "sidebarContent")]
     (dom/removeChildren $container)
-    (apply dom/append $container $sidebar-dom)))
+    (if (seqable? $sidebar-dom)
+      (apply dom/append $container $sidebar-dom)
+      (dom/append $container $sidebar-dom))))
 
 (defn run-render-loop
   "Runs the model-update-view loop"
@@ -116,6 +121,17 @@
 (defn handle-close-button [e]
   (.postMessage js/window.parent (clj->js {:type "closeSidebar"}) "*"))
 
+(defn fetch-hits
+  "Fetch hits in the Algolia API matching the URL"
+  []
+  (go (-> js/browser
+          (.-runtime)
+          (.sendMessage (clj->js {:type "hits"}))
+          (promise->channel)
+          (<!)
+          (array-seq)
+          ((fn [hits] (map obj->clj hits))))))
+
 (defn fetch-items
   "Fetch items matching the URL"
   []
@@ -135,10 +151,10 @@
   (events/listen (dom/getElement "closeSidebar") "click" handle-close-button)
   (let [initial-state (update-state {:type :loading :loading true} (model))]
     (run-render-loop initial-state)
-    (go (-> (fetch-items)
+    (go (-> (fetch-hits)
             (<!)
-            (#(update-state {:type :items
-                             :items %} initial-state))
+            (#(update-state {:type :hits
+                             :hits %} initial-state))
             (#(update-state {:type :loading
                              :loading false} %))
             (run-render-loop)))))

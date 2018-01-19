@@ -8,6 +8,7 @@
 (enable-console-print!)
 
 (def object-ids (atom []))
+(def hits (atom []))
 
 (defn url-path
   "Returns a url without its protocol"
@@ -22,9 +23,9 @@
     (filter #(= (url-path (get % "url")) (url-path url)) hits)))
 
 (defn sort-hits
-  "Sorts hits from hn.algolia.com by post date descending"
+  "Sorts hits from hn.algolia.com by points date descending"
   [hits]
-  (sort-by #(get % "created_at_i") #(compare %2 %1) hits))
+  (sort-by #(get % "points") #(compare %2 %1) hits))
 
 (defn total-num-comments
   "Returns the total number of comments from some hits"
@@ -43,18 +44,15 @@
                     (<!)
                     (first)
                     (.-url))
-            hits (-> url
-                     (hn/fetch-submission)
-                     (<!)
-                     (filter-response url)
-                     (sort-hits))
-            ids (map #(% "objectID") hits)
-            num-comments (total-num-comments hits)]
+            fetched-hits (-> url
+                             (hn/fetch-submission)
+                             (<!)
+                             (filter-response url)
+                             (sort-hits))
+            ids (map #(% "objectID") fetched-hits)
+            num-comments (total-num-comments fetched-hits)]
+        (reset! hits fetched-hits)
         (reset! object-ids ids)
-        (-> js/browser
-            (.-runtime)
-            (.sendMessage (clj->js {:type "objectIds"
-                                    :ids @object-ids})))
         (set-badge-text! (str num-comments)))))
 
 (defn handle-browser-action [tab]
@@ -65,8 +63,10 @@
 
 (defn handle-message [msg sender respond]
   (case (.-type msg)
-    "fetchItems" (channel->promise
-                  (go (clj->js (<! (hn/fetch-items @object-ids)))))))
+    "hits" (channel->promise (go @hits))
+    "fetchItems" (do (log/debug "received fetch items message")
+                   (channel->promise
+                   (go (clj->js (<! (hn/fetch-items @object-ids))))))))
 
 (-> js/browser
     (.-tabs)
