@@ -64,7 +64,7 @@
 (defn model
   "Returns initial sidebar state"
   []
-  {:items ()
+  {:item ()
    :hits ()
    :depth []
    :loading false})
@@ -73,7 +73,7 @@
   "Given a message and the old state, returns the new state"
   [msg state]
   (case (:type msg)
-    :items (assoc state :items (:items msg))
+    :item (assoc state :item (:item msg))
     :hits (assoc state :hits (:hits msg))
     :loading (assoc state :loading (:loading msg))
     state))
@@ -84,7 +84,20 @@
   (log/debug state)
   (if (:loading state)
     (components/loader)
-    (map #(components/card (:title %)) (:hits state))
+    (map #(-> (components/card
+               (components/body30 (:title %))
+               (components/story-caption (:points %)
+                                         (:author %)
+                                         (* (:created_at_i %) 1000))
+               (components/comments-indicator (:num_comments %)))
+              ((fn [card]
+                 (if (> (:num_comments %) 0)
+                   (components/with-classes card "clickable")
+                   card)))
+              (components/with-listener
+                "click"
+                (fn [e] (log/debug %))))
+         (:hits state))
     #_(let [current-item (get-in-items (:items state) (:depth state))]
       (if (> (count current-item) 1)
         (map #(components/card (:title %)) current-item)
@@ -132,18 +145,16 @@
           (array-seq)
           ((fn [hits] (map obj->clj hits))))))
 
-(defn fetch-items
-  "Fetch items matching the URL"
-  []
+(defn fetch-item
+  "Fetch the item with id `id`"
+  [id]
   (go (-> js/browser
           (.-runtime)
-          (.sendMessage (clj->js {:type "fetchItems"}))
+          (.sendMessage (clj->js {:type "fetchItem"
+                                  :id id}))
           (promise->channel)
           (<!)
-          (array-seq)
-          ((fn [items] (filter #(not (nil? %)) items)))
-          ((fn [items] (map obj->clj items)))
-          ((fn [items] (sort-by :points #(compare %2 %1) items))))))
+          (obj->clj))))
 
 (defn init
   "Initializes the sidebar"

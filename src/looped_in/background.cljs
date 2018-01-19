@@ -64,9 +64,8 @@
 (defn handle-message [msg sender respond]
   (case (.-type msg)
     "hits" (channel->promise (go @hits))
-    "fetchItems" (do (log/debug "received fetch items message")
-                   (channel->promise
-                   (go (clj->js (<! (hn/fetch-items @object-ids))))))))
+    "fetchItem" (channel->promise
+                 (go (clj->js (<! (hn/fetch-item (.-id msg))))))))
 
 (-> js/browser
     (.-tabs)
