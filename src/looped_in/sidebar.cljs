@@ -74,18 +74,31 @@
                     (cons
                      (case (:type current-item)
                        "story" (components/card
-                                (components/body30 (:title current-item))
+                                (dom/createDom
+                                 "div"
+                                 "storyHeader"
+                                 (components/body30 (:title current-item))
+                                 (components/item-link (:id current-item)))
                                 (components/story-caption (:points current-item)
                                                           (:author current-item)
                                                           (* (:created_at_i current-item) 1000)))
                        "comment" (components/card
-                                  (components/comment-caption (:author current-item)
-                                                              (* (:created_at_i current-item) 1000))
+                                  (dom/createDom
+                                   "div"
+                                   "commentHeader"
+                                   (components/comment-caption (:author current-item)
+                                                               (* (:created_at_i current-item) 1000))
+                                   (components/item-link (:id current-item)))
                                   (components/comment-text (:text current-item))))
                      (map-indexed (fn [index child]
                             (-> (components/card
-                                 (components/comment-caption (:author child)
-                                                             (* (:created_at_i child) 1000))
+                                 (dom/createDom
+                                  "div"
+                                  "commentHeader"
+                                  (components/comment-caption
+                                   (:author child)
+                                   (* (:created_at_i child) 1000))
+                                  (components/item-link (:id child)))
                                  (components/comment-text (:text child))
                                  (components/replies-indicator (count (:children child))))
                                 (components/with-classes "child")
@@ -105,7 +118,11 @@
                                (sort-by #(count (:children %)) #(compare %2 %1))))))
     (:hits state) (map (fn [hit]
                          (-> (components/card
-                              (components/body30 (:title hit))
+                              (dom/createDom
+                               "div"
+                               "storyHeader"
+                               (components/body30 (:title hit))
+                               (components/item-link (:objectID hit)))
                               (components/story-caption (:points hit)
                                                         (:author hit)
                                                         (* (:created_at_i hit) 1000))

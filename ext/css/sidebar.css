@@ -285,6 +285,18 @@ html, body {
     justify-content: center;
 }
 
+.commentHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.storyHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
 .title30 {
     font-size: 22px;
     font-weight: 300;

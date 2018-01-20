@@ -30,6 +30,22 @@
                  "commentsIndicator"
                  (caption30 (str num-replies " " (if (not= num-replies 1) "replies" "reply")))))
 
+(defn with-listener [el type listener]
+  (events/listen el type listener)
+  el)
+
+(defn item-link [id]
+  (with-listener
+    (dom/createDom "a"
+                   (clj->js {:href (str "https://news.ycombinator.com/item?id=" id)
+                             :target "_blank"})
+                   (dom/createDom "img"
+                                  (clj->js {:src "icons/open-in-new-16.svg"
+                                            :width 12
+                                            :height 12})))
+    "click"
+    #(.stopPropagation %)))
+
 (defn get-time-ago-str
   "Returns the string '<number> <unit>' based on how long ago `timestamp` was,
   for example '3 days' or '5 hours'"
@@ -61,10 +77,6 @@
   (apply dom/createDom "div" "spinner"
          (for [i (range 1 6)]
            (dom/createDom "div" (str "rect" i)))))
-
-(defn with-listener [el type listener]
-  (events/listen el type listener)
-  el)
 
 (defn with-classes [el & classes]
   (doseq [class (filter #(not (string/blank? %)) classes)]
