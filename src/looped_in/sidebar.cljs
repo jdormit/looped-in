@@ -163,6 +163,7 @@
   [$sidebar-dom]
   (let [$container (dom/getElement "sidebarContent")]
     (dom/removeChildren $container)
+    (.scrollTo js/window 0 0)
     (if (seqable? $sidebar-dom)
       (apply dom/append $container $sidebar-dom)
       (dom/append $container $sidebar-dom))))
