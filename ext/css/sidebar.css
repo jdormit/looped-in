@@ -222,6 +222,7 @@
 * {
     font-family: 'Fira Sans', Arial, Helvetica, sans-serif;
     color: #0c0c0d;
+    box-sizing: border-box;
 }
 
 html, body {
@@ -236,7 +237,13 @@ html, body {
     box-sizing: border-box;
 }
 
+#sidebarContent {
+    height: 96%;
+    overflow: scroll;
+}
+
 .sidebarHeader {
+    height: 4%;
     display: flex;
     align-items: center;
     padding: 8px;
@@ -253,7 +260,7 @@ html, body {
 
 .card {
     background-color: #f9f9fa;
-    width: 90%;
+    width: 284px;
     margin: auto;
     margin-top: 8px;
     padding: 8px;
@@ -261,10 +268,15 @@ html, body {
     flex-direction: column;
     justify-content: center;
     box-shadow: 0 1px 4px rgba(12, 12, 13, 0.1);
+    box-sizing: border-box;
 }
 
 .card.clickable:hover {
     box-shadow: 0 2px 8px rgba(12, 12, 13, 0.1);
+}
+
+.card.child {
+    border-left: 4px solid #b1b1b3;
 }
 
 .commentsIndicator {
@@ -281,6 +293,11 @@ html, body {
 .title20 {
     font-size: 17px;
     font-weight: 500;
+}
+
+.body10 {
+    font-size: 13px;
+    font-weight: 400;
 }
 
 .body20 {

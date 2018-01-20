@@ -7,65 +7,36 @@
             [looped-in.components :as components]
             [looped-in.promises :refer [promise->channel]]
             [looped-in.logging :as log])
-  (:require-macros [looped-in.macros :refer [get-in-items]])
+  (:require-macros [looped-in.macros :refer [get-in-item]])
   (:import (goog.ui Zippy)))
 
 (enable-console-print!)
 
-(defn comment-dom [comment]
-  (let [text (.-text comment)
-        author (.-author comment)
-        children (array-seq (.-children comment))
-        $text (dom/createDom "div"
-                             #js {:class "commentText body20"}
-                             (dom/safeHtmlToNode (Sanitizer/sanitize text)))
-        $author (dom/createDom "div"
-                              #js {:class "commentAuthor"}
-                              author)
-        $card (dom/createDom "div" #js {:class "card"} $text $author)]
-    (if (> (count children) 0)
-      (let [$toggle (dom/createDom "img"
-                                   #js {:class "commentToggle"
-                                        :src "icons/arrowhead-down-16.svg"
-                                        :width "16px"
-                                        :height "16px"})
-            $children (apply dom/createDom
-                             "div"
-                             #js {:class "commentChildren"}
-                             (clj->js (map comment-dom children)))]
-        (Zippy. $toggle $children)
-        (dom/appendChild $card $toggle)
-        (dom/createDom "div"
-                       #js {:class "comment"}
-                       $card
-                       $children))
-      (dom/createDom "div"
-                     #js {:class "comment"}
-                     $card))))
+(defn obj->clj [obj]
+  (into {} (for [k (.keys js/Object obj)]
+             [(keyword k)
+              (let [v (aget obj k)]
+                (cond
+                  (object? v) (obj->clj v)
+                  (.isArray js/Array v) (map obj->clj (array-seq v))
+                  :default (js->clj v)))])))
 
-(defn comments-dom [comments]
-  (clj->js
-   (apply dom/createDom
-          "div"
-          #js {:class "comments"}
-          (map comment-dom comments))))
-
-(defn story-dom [story]
-  (let [$title (dom/createDom "div"
-                              #js {:class "storyTitle title20 card"}
-                              (.-title story))
-        $comments (comments-dom (filter #(= "comment" (.-type %)) (array-seq (.-children story))))]
-    (Zippy. $title $comments)
-    (dom/createDom "div"
-                   #js {:class "story"}
-                   $title
-                   $comments)))
+(defn fetch-item
+  "Fetch the item with id `id`"
+  [id]
+  (go (-> js/browser
+          (.-runtime)
+          (.sendMessage (clj->js {:type "fetchItem"
+                                  :id id}))
+          (promise->channel)
+          (<!)
+          (obj->clj))))
 
 (defn model
   "Returns initial sidebar state"
   []
-  {:item ()
-   :hits ()
+  {:item nil
+   :hits nil
    :depth []
    :loading false})
 
@@ -73,8 +44,12 @@
   "Given a message and the old state, returns the new state"
   [msg state]
   (case (:type msg)
-    :item (assoc state :item (:item msg))
-    :hits (assoc state :hits (:hits msg))
+    :got-item (-> state
+                  (assoc :item (:item msg))
+                  (assoc :loading false))
+    :got-hits (-> state
+                  (assoc :hits (:hits msg))
+                  (assoc :loading false))
     :loading (assoc state :loading (:loading msg))
     state))
 
@@ -82,22 +57,48 @@
   "Given a callback to dispatch an update message and the sidebar state, returns the sidebar DOM"
   [dispatch-message state]
   (log/debug state)
-  (if (:loading state)
-    (components/loader)
-    (map #(-> (components/card
-               (components/body30 (:title %))
-               (components/story-caption (:points %)
-                                         (:author %)
-                                         (* (:created_at_i %) 1000))
-               (components/comments-indicator (:num_comments %)))
-              ((fn [card]
-                 (if (> (:num_comments %) 0)
-                   (components/with-classes card "clickable")
-                   card)))
-              (components/with-listener
-                "click"
-                (fn [e] (log/debug %))))
-         (:hits state))
+  (cond
+    (:loading state) (components/loader)
+    (:item state) (let [current-item (get-in-item (:item state) (:depth state))]
+                    (cons
+                     (case (:type current-item)
+                       "story" (components/card
+                                (components/body30 (:title current-item))
+                                (components/story-caption (:points current-item)
+                                                          (:author current-item)
+                                                          (* (:created_at_i current-item) 1000)))
+                       "comment" ())
+                     (map (fn [child]
+                            (-> (components/card
+                                 (components/comment-caption (:author child)
+                                                             (* (:created_at_i child) 1000))
+                                 (components/comment-text (:text child))
+                                 (components/replies-indicator (count (:children child))))
+                                (components/with-classes "child")))
+                          (->> (:children current-item)
+                               (filter #(contains? % :text))
+                               (sort-by #(count (:children %)) #(compare %2 %1))))))
+    (:hits state) (map (fn [hit]
+                         (-> (components/card
+                              (components/body30 (:title hit))
+                              (components/story-caption (:points hit)
+                                                        (:author hit)
+                                                        (* (:created_at_i hit) 1000))
+                              (components/comments-indicator (:num_comments hit)))
+                             ((fn [card]
+                                (if (> (:num_comments hit) 0)
+                                  (components/with-classes card "clickable")
+                                  card)))
+                             (components/with-listener
+                               "click"
+                               (fn [e]
+                                 (dispatch-message {:type :loading :loading true})
+                                 (go
+                                   (-> (fetch-item (:objectID hit))
+                                       (<!)
+                                       ((fn [item]
+                                          (dispatch-message {:type :got-item :item item})))))))))
+                       (:hits state))
     #_(let [current-item (get-in-items (:items state) (:depth state))]
       (if (> (count current-item) 1)
         (map #(components/card (:title %)) current-item)
@@ -122,15 +123,6 @@
                              (run-render-loop new-state)))]
     (render (view dispatch-message state))))
 
-(defn obj->clj [obj]
-  (into {} (for [k (.keys js/Object obj)]
-             [(keyword k)
-              (let [v (aget obj k)]
-                (cond
-                  (object? v) (obj->clj v)
-                  (.isArray js/Array v) (map obj->clj (array-seq v))
-                  :default (js->clj v)))])))
-
 (defn handle-close-button [e]
   (.postMessage js/window.parent (clj->js {:type "closeSidebar"}) "*"))
 
@@ -145,17 +137,6 @@
           (array-seq)
           ((fn [hits] (map obj->clj hits))))))
 
-(defn fetch-item
-  "Fetch the item with id `id`"
-  [id]
-  (go (-> js/browser
-          (.-runtime)
-          (.sendMessage (clj->js {:type "fetchItem"
-                                  :id id}))
-          (promise->channel)
-          (<!)
-          (obj->clj))))
-
 (defn init
   "Initializes the sidebar"
   []
@@ -164,10 +145,8 @@
     (run-render-loop initial-state)
     (go (-> (fetch-hits)
             (<!)
-            (#(update-state {:type :hits
+            (#(update-state {:type :got-hits
                              :hits %} initial-state))
-            (#(update-state {:type :loading
-                             :loading false} %))
             (run-render-loop)))))
 
 (init)
