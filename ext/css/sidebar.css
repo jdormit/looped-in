@@ -275,6 +275,19 @@ html, body {
     box-shadow: 0 2px 8px rgba(12, 12, 13, 0.1);
 }
 
+.itemLink {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.itemLink:hover {
+    cursor: default;
+    background-color: #d7d7db;
+}
+
 .card.child {
     border-left: 4px solid #b1b1b3;
 }

@@ -63,7 +63,8 @@
 (defn item-link [id]
   (with-listener
     (dom/createDom "a"
-                   (clj->js {:href (str "https://news.ycombinator.com/item?id=" id)
+                   (clj->js {:class "itemLink"
+                             :href (str "https://news.ycombinator.com/item?id=" id)
                              :target "_blank"})
                    (dom/createDom "img"
                                   (clj->js {:src "icons/open-in-new-16.svg"
