@@ -100,18 +100,22 @@
                                    (* (:created_at_i child) 1000))
                                   (components/item-link (:id child)))
                                  (components/comment-text (:text child))
-                                 (components/replies-indicator (count (:children child))))
+                                 (-> (components/replies-indicator (count (:children child)))
+                                     ((fn [indicator]
+                                        (if (> (count (:children child)) 0)
+                                          (-> indicator
+                                              (components/with-classes "clickable")
+                                              (components/with-listener
+                                                "click"
+                                                (fn [e]
+                                                  (dispatch-message
+                                                   {:type :enq-depth
+                                                    :index index}))))
+                                          indicator)))))
                                 (components/with-classes "child")
                                 ((fn [card]
                                    (if (> (count (:children child)) 0)
-                                     (-> card
-                                         (components/with-classes "clickable")
-                                         (components/with-listener
-                                           "click"
-                                           (fn [e]
-                                             (dispatch-message
-                                              {:type :enq-depth
-                                               :index index}))))
+                                     (components/with-classes card "clickable")
                                      card)))))
                           (->> (:children current-item)
                                (filter #(contains? % :text))
@@ -126,21 +130,25 @@
                               (components/story-caption (:points hit)
                                                         (:author hit)
                                                         (* (:created_at_i hit) 1000))
-                              (components/comments-indicator (:num_comments hit)))
+                              (-> (components/comments-indicator (:num_comments hit))
+                                  ((fn [indicator]
+                                     (if (> (:num_comments hit) 0)
+                                       (-> indicator
+                                           (components/with-classes "clickable")
+                                           (components/with-listener
+                                             "click"
+                                             (fn [e]
+                                               (dispatch-message {:type :loading :loading true})
+                                               (go
+                                                 (-> (fetch-item (:objectID hit))
+                                                     (<!)
+                                                     ((fn [item]
+                                                        (dispatch-message
+                                                         {:type :got-item :item item}))))))))
+                                       indicator)))))
                              ((fn [card]
                                 (if (> (:num_comments hit) 0)
-                                  (-> card
-                                      (components/with-classes "clickable")
-                                      (components/with-listener
-                                        "click"
-                                        (fn [e]
-                                          (dispatch-message {:type :loading :loading true})
-                                          (go
-                                            (-> (fetch-item (:objectID hit))
-                                                (<!)
-                                                ((fn [item]
-                                                   (dispatch-message
-                                                    {:type :got-item :item item}))))))))
+                                  (components/with-classes card "clickable")
                                   card)))))
                        (:hits state))
     #_(let [current-item (get-in-items (:items state) (:depth state))]

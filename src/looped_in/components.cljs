@@ -20,15 +20,41 @@
 (defn caption30 [text]
   (dom/createDom "span" "caption30" text))
 
+(defn with-append [el child]
+  (dom/appendChild el child)
+  el)
+
 (defn comments-indicator [num-comments]
-  (dom/createDom "div"
-                 "commentsIndicator"
-                 (caption30 (str num-comments " comment" (when (not= num-comments 1) "s")))))
+  (let [text (caption30 (str num-comments " comment" (when (not= num-comments 1) "s")))]
+    (dom/createDom "div"
+                   "commentsIndicator"
+                   (if (> num-comments 0)
+                     (with-append
+                       text
+                       (dom/createDom
+                        "img"
+                        (clj->js
+                         {:src "icons/arrowhead-down-16.svg"
+                          :height "16px"
+                          :width "16px"
+                          :class "clickableArrowIcon"})))
+                     text))))
 
 (defn replies-indicator [num-replies]
-  (dom/createDom "div"
-                 "commentsIndicator"
-                 (caption30 (str num-replies " " (if (not= num-replies 1) "replies" "reply")))))
+  (let [text (caption30 (str num-replies " " (if (not= num-replies 1) "replies" "reply")))]
+    (dom/createDom "div"
+                   "commentsIndicator"
+                   (if (> num-replies 0)
+                     (with-append
+                       text
+                       (dom/createDom
+                        "img"
+                        (clj->js
+                         {:src "icons/arrowhead-down-16.svg"
+                          :height "16px"
+                          :width "16px"
+                          :class "clickableArrowIcon"})))
+                     text))))
 
 (defn with-listener [el type listener]
   (events/listen el type listener)

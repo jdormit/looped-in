@@ -285,6 +285,19 @@ html, body {
     justify-content: center;
 }
 
+.commentsIndicator span {
+    padding: 4px;
+    padding-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.commentsIndicator.clickable:hover span {
+    background-color: #d7d7db;
+    cursor: default;
+}
+
 .commentHeader {
     display: flex;
     align-items: center;
