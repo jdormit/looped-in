@@ -1,14 +1,11 @@
 (ns looped-in.sidebar
   (:require [goog.dom :as dom]
             [goog.events :as events]
-            [goog.html.sanitizer.HtmlSanitizer :as Sanitizer]
             [cljs.core.async :refer [go <!]]
             [looped-in.hackernews :as hn]
             [looped-in.components :as components]
             [looped-in.promises :refer [promise->channel]]
-            [looped-in.logging :as log])
-  (:require-macros [looped-in.macros :refer [get-in-item]])
-  (:import (goog.ui Zippy)))
+            [looped-in.logging :as log]))
 
 (enable-console-print!)
 
@@ -27,6 +24,10 @@
          (->> (:children item)
               (filter #(contains? % :text))
               (sort-by #(count (:children % [])) #(compare %2 %1))
+              (map (fn [child]
+                     (if (> (count (:children child)) 0)
+                       (sort-and-filter-item child)
+                       child)))
               (vec))))
 
 (defn fetch-item
@@ -38,7 +39,15 @@
                                   :id id}))
           (promise->channel)
           (<!)
-          (obj->clj))))
+          (obj->clj)
+          (sort-and-filter-item))))
+
+(defn get-in-item
+  "Retrieves the child from item represented by `depth`"
+  [item [fdepth & rdepth]]
+  (if (nil? fdepth)
+    item
+    (get-in-item (nth (:children item) fdepth) rdepth)))
 
 (defn model
   "Returns initial sidebar state"
@@ -69,7 +78,7 @@
   (cond
     (:loading state) (components/loader)
     (:item state) (let [current-item (get-in-item
-                                      (sort-and-filter-item (:item state))
+                                      (:item state)
                                       (:depth state))]
                     (cons
                      (case (:type current-item)
