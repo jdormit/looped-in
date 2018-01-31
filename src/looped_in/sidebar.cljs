@@ -81,7 +81,7 @@
   (cond
     (:loading state) (list (components/sidebar-header (components/with-classes
                                                         (components/header-icon "icons/icon48.png")
-                                                        "headerIcon"))
+                                                        "headerIcon" "nonClickable"))
                            (components/sidebar-content (components/loader)))
     (:item state) (list
                    (components/sidebar-header (dom/createDom
@@ -148,7 +148,7 @@
     (:hits state) (list
                    (components/sidebar-header (components/with-classes
                                                 (components/header-icon "icons/icon48.png")
-                                                "headerIcon"))
+                                                "headerIcon" "nonClickable"))
                    (apply
                     components/sidebar-content
                     (map (fn [hit]

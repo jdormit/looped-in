@@ -380,10 +380,14 @@ html, body {
     margin-right: 4px;
 }
 
+.headerIcon.nonClickable {
+    margin-left: 4px;
+    margin-right: 8px;
+}
+
 .headerIcon.iconButton {
-    padding: 0;
-    width: 16px;
-    height: 20px;
+    width: 24px;
+    height: 28px;
 }
 
 .spinner {
