@@ -68,6 +68,9 @@
                   (assoc :hits (:hits msg))
                   (assoc :loading false))
     :enq-depth (assoc state :depth (conj (:depth state) (:index msg)))
+    :deq-depth (assoc state :depth
+                      (subvec (:depth state) 0 (- (count (:depth state)) 1)))
+    :clear-item (assoc state :item nil)
     :loading (assoc state :loading (:loading msg))
     state))
 
@@ -197,8 +200,15 @@
 
 (defn handle-events
   "Registers event listeners"
-  [state]
-  (events/listen (dom/getElement "closeSidebar") "click" handle-close-button))
+  [dispatch-message state]
+  (events/listen (dom/getElement "closeSidebar") "click" handle-close-button)
+  (when (not (nil? (dom/getElement "backButton")))
+      (events/listen (dom/getElement "backButton") "click" (fn [e]
+                                                          (let [depth (:depth state)]
+                                                            (if (> (count depth) 0)
+                                                              (dispatch-message {:type :deq-depth})
+                                                              (dispatch-message
+                                                               {:type :clear-item})))))))
 
 (defn run-render-loop
   "Runs the model-update-view loop"
@@ -207,7 +217,7 @@
                            (let [new-state (update-state msg state)]
                              (run-render-loop new-state)))]
     (render (view dispatch-message state))
-    (handle-events state)))
+    (handle-events dispatch-message state)))
 
 (defn fetch-hits
   "Fetch hits in the Algolia API matching the URL"
