@@ -24,6 +24,9 @@
   (dom/appendChild el child)
   el)
 
+(defn sidebar-content [& body]
+  (apply dom/createDom "div" (clj->js {:id "sidebarContent"}) body))
+
 (defn comments-indicator [num-comments]
   (let [text (caption30 (str num-comments " comment" (when (not= num-comments 1) "s")))]
     (dom/createDom "div"
@@ -104,6 +107,22 @@
   (apply dom/createDom "div" "spinner"
          (for [i (range 1 6)]
            (dom/createDom "div" (str "rect" i)))))
+
+(defn sidebar-header [icon-src]
+  (dom/createDom "div" "sidebarHeader"
+                 (dom/createDom "img"
+                                (clj->js {:class "headerIcon"
+                                          :src icon-src
+                                          :width "16px"
+                                          :height "16px"}))
+                 (dom/createDom "span" "body30 headerTitle" "Looped In")
+                 (dom/createDom "button"
+                                (clj->js {:class "iconButton"
+                                          :id "closeSidebar"})
+                                (dom/createDom "img"
+                                               (clj->js {:src "icons/stop-16.svg"
+                                                         :width "16px"
+                                                         :height "16px"})))))
 
 (defn with-classes [el & classes]
   (doseq [class (filter #(not (string/blank? %)) classes)]
