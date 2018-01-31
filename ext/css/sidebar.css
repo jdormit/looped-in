@@ -254,10 +254,6 @@ html, body {
     flex: 1 0 auto;
 }
 
-.headerIcon {
-    margin-right: 4px;
-}
-
 .card {
     background-color: #f9f9fa;
     width: 284px;
@@ -378,6 +374,16 @@ html, body {
 
 .iconButton:hover {
     background-color: #d7d7db;
+}
+
+.headerIcon {
+    margin-right: 4px;
+}
+
+.headerIcon.iconButton {
+    padding: 0;
+    width: 16px;
+    height: 20px;
 }
 
 .spinner {

@@ -76,10 +76,16 @@
   [dispatch-message state]
   (log/debug state)
   (cond
-    (:loading state) (list (components/sidebar-header "icons/icon48.png")
+    (:loading state) (list (components/sidebar-header (components/with-classes
+                                                        (components/header-icon "icons/icon48.png")
+                                                        "headerIcon"))
                            (components/sidebar-content (components/loader)))
     (:item state) (list
-                   (components/sidebar-header "icons/back-16.svg")
+                   (components/sidebar-header (dom/createDom
+                                               "button"
+                                               (clj->js {:class "headerIcon iconButton"
+                                                         :id "backButton"})
+                                               (components/header-icon "icons/back-16.svg")))
                    (apply
                     components/sidebar-content
                     (let [current-item (get-in-item
@@ -115,7 +121,8 @@
                                              (* (:created_at_i child) 1000))
                                             (components/item-link (:id child)))
                                            (components/comment-text (:text child))
-                                           (-> (components/replies-indicator (count (:children child)))
+                                           (-> (components/replies-indicator
+                                                (count (:children child)))
                                                ((fn [indicator]
                                                   (if (> (count (:children child)) 0)
                                                     (-> indicator
@@ -136,7 +143,9 @@
                                          (filter #(contains? % :text))
                                          (sort-by #(count (:children %)) #(compare %2 %1))))))))
     (:hits state) (list
-                   (components/sidebar-header "icons/icon48.png")
+                   (components/sidebar-header (components/with-classes
+                                                (components/header-icon "icons/icon48.png")
+                                                "headerIcon"))
                    (apply
                     components/sidebar-content
                     (map (fn [hit]

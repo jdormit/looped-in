@@ -108,13 +108,15 @@
          (for [i (range 1 6)]
            (dom/createDom "div" (str "rect" i)))))
 
-(defn sidebar-header [icon-src]
+(defn header-icon [src]
+  (dom/createDom "img"
+                 (clj->js {:src src
+                           :width "16px"
+                           :height "16px"})))
+
+(defn sidebar-header [icon-el]
   (dom/createDom "div" "sidebarHeader"
-                 (dom/createDom "img"
-                                (clj->js {:class "headerIcon"
-                                          :src icon-src
-                                          :width "16px"
-                                          :height "16px"}))
+                 icon-el
                  (dom/createDom "span" "body30 headerTitle" "Looped In")
                  (dom/createDom "button"
                                 (clj->js {:class "iconButton"
