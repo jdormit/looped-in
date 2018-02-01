@@ -17,7 +17,7 @@
 (defn init-amplitude
   "Injects the Amplitude bootstrapping script if DNT is disabled"
   []
-  (when (not (do-not-track))
+  (when-not (do-not-track)
     (dom/appendChild (.-body (dom/getDocument))
                      (dom/createDom "script" nil amplitude-init-code))
     (go (let [user-id (-> js/browser
@@ -31,7 +31,7 @@
   "Logs an event to Amplitude. Returns a channel that resolves with the response from Amplitude"
   ([event-name properties]
    (let [res-channel (chan)]
-     (when (not (nil? js/amplitude))
+     (when (and (not (do-not-track)) (exists? js/amplitude))
        (.logEvent (.getInstance js/amplitude)
                   event-name
                   (clj->js properties)
