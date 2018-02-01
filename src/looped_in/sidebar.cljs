@@ -224,10 +224,7 @@
       (dom/append $container $sidebar-dom))))
 
 (defn handle-close-button [e]
-  (go (-> (analytics/log-event "CLOSED_SIDEBAR")
-          (<!)
-          ((fn [_]
-             (.postMessage js/window.parent (clj->js {:type "closeSidebar"}) "*"))))))
+  (.postMessage js/window.parent (clj->js {:type "closeSidebar"}) "*"))
 
 (defn handle-events
   "Registers event listeners"

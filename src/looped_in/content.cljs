@@ -2,6 +2,7 @@
   (:require [goog.dom :as dom]
             [goog.events :as events]
             [goog.style :as style]
+            [looped-in.analytics :as analytics]
             [looped-in.logging :as log]))
 
 (def sidebar-width 300)
@@ -34,6 +35,7 @@
 (defn close-sidebar []
   (let [$html (.-documentElement js/document)
         $sidebar (dom/getElement "loopedInSidebar")]
+    (analytics/log-event "CLOSED_SIDEBAR")
     (dom/removeNode $sidebar)
     (set! (-> $html (.-style) (.-paddingLeft)) @old-html-padding)))
 
