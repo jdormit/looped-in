@@ -17,7 +17,7 @@
                                      :height "100%"
                                      :border 0
                                      :borderRight "2px solid #d7d7db"
-                                     :zIndex 9999
+                                     :zIndex 9999999999999
                                      :width (str sidebar-width "px")
                                      :top 0
                                      :left 0})})))
