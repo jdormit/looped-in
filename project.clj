@@ -27,6 +27,6 @@
                                       :sidebar
                                       {:output-to "ext/js/generated/sidebar.js"
                                        :entries #{"looped-in.sidebar"}}}}}}}}
-             :dev {:deoendencies [[com.cemerick/piggieback "0.2.2"]
+             :dev {:dependencies [[com.cemerick/piggieback "0.2.2"]
                                   [org.clojure/tools.nrepl "0.2.10"]]
                    :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}}})
