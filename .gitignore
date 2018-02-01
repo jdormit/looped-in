@@ -11,3 +11,4 @@ pom.xml.asc
 .hg/
 ext/js/generated/
 .cljs_rhino_repl
+profiles.clj
