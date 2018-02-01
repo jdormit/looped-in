@@ -3,6 +3,7 @@
             [ajax.core :refer [GET]]
             [goog.string :as gstring]
             [looped-in.hackernews :as hn]
+            [looped-in.analytics :as analytics]
             [looped-in.logging :as log]
             [looped-in.promises :refer [channel->promise promise->channel]]))
 
@@ -85,7 +86,8 @@
     "hits" (channel->promise (go @hits))
     "fetchItem" (channel->promise
                  (go (clj->js (<! (hn/fetch-item (.-id msg))))))
-    "getUserId" (channel->promise (get-user-id))))
+    "getUserId" (channel->promise (get-user-id))
+    "logEvent" (analytics/log-event (.-eventType msg) (.-eventProperties msg))))
 
 (-> js/browser
     (.-tabs)
@@ -107,3 +109,4 @@
     (.-onMessage)
     (.addListener handle-message))
 
+(analytics/init-amplitude)

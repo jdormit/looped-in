@@ -35,7 +35,8 @@
 (defn close-sidebar []
   (let [$html (.-documentElement js/document)
         $sidebar (dom/getElement "loopedInSidebar")]
-    (analytics/log-event "CLOSED_SIDEBAR")
+    (-> js/browser (.-runtime) (.sendMessage (clj->js {:type "logEvent"
+                                                       :eventType "CLOSED_SIDEBAR"})))
     (dom/removeNode $sidebar)
     (set! (-> $html (.-style) (.-paddingLeft)) @old-html-padding)))
 
