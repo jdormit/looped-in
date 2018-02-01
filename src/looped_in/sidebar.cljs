@@ -5,7 +5,8 @@
             [looped-in.hackernews :as hn]
             [looped-in.components :as components]
             [looped-in.promises :refer [promise->channel]]
-            [looped-in.logging :as log]))
+            [looped-in.logging :as log]
+            [looped-in.analytics :as analytics]))
 
 (enable-console-print!)
 
@@ -233,6 +234,7 @@
 (defn init
   "Initializes the sidebar"
   []
+  (analytics/init-amplitude)
   (let [initial-state (update-state {:type :loading :loading true} (model))]
     (run-render-loop initial-state)
     (go (-> (fetch-hits)
