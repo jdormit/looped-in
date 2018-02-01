@@ -78,7 +78,6 @@
 (defn view
   "Given a callback to dispatch an update message and the sidebar state, returns the sidebar DOM"
   [dispatch-message state]
-  (log/debug state)
   (cond
     (:loading state) (list (components/sidebar-header (components/with-classes
                                                         (components/header-icon "icons/icon48.png")
