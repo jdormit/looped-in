@@ -11,20 +11,22 @@
   :plugins [[lein-cljsbuild "1.1.7"]]
   :profiles {:cljs-shared
              {:cljsbuild
-              {:builds [{:source-paths ["src"]
-                         :compiler {:optimizations :simple
-                                    :pretty-print true
-                                    :source-map true
-                                    :output-dir "ext/js/generated/out"
-                                    :modules {:background
-                                              {:output-to "ext/js/generated/background.js"
-                                               :entries #{"looped-in.background"}}
-                                              :content
-                                              {:output-to "ext/js/generated/content.js"
-                                               :entries #{"looped-in.content"}}
-                                              :sidebar
-                                              {:output-to "ext/js/generated/sidebar.js"
-                                               :entries #{"looped-in.sidebar"}}}}}]}}
-             :dev {:dependencies [[com.cemerick/piggieback "0.2.2"]
+              {:builds
+               {:main
+                {:source-paths ["src"]
+                 :compiler {:optimizations :simple
+                            :pretty-print true
+                            :source-map true
+                            :output-dir "ext/js/generated/out"
+                            :modules {:background
+                                      {:output-to "ext/js/generated/background.js"
+                                       :entries #{"looped-in.background"}}
+                                      :content
+                                      {:output-to "ext/js/generated/content.js"
+                                       :entries #{"looped-in.content"}}
+                                      :sidebar
+                                      {:output-to "ext/js/generated/sidebar.js"
+                                       :entries #{"looped-in.sidebar"}}}}}}}}
+             :dev {:deoendencies [[com.cemerick/piggieback "0.2.2"]
                                   [org.clojure/tools.nrepl "0.2.10"]]
                    :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}}})

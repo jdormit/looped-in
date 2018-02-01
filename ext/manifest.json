@@ -31,6 +31,6 @@
         }
     ],
     "permissions": ["tabs", "https://hn.algolia.com/*"],
-    "content_security_policy": "script-src 'self' 'unsafe-eval' 'sha256-CfMPE8ys/ylJ5D9qKG0a9/UejrcczMr4/EmFCbVbgcc=' 'sha256-XsBu2nEJnS7x/Izq1v7dzy3Ze5myJMHvg4zukh/R1Yk=' 'sha256-AUCho1UyOpYFSZDg8EM9SYlysRIrUpQKZ7iE9CFSYfU=' 'sha256-vLlTaRFN8A2FPadIx711FwK9Ytd6LXkAzuEYAdC0D1k='; object-src 'self'; connect-src 'self' https://hn.algolia.com",
+    "content_security_policy": "script-src 'self' 'unsafe-eval' 'sha256-CfMPE8ys/ylJ5D9qKG0a9/UejrcczMr4/EmFCbVbgcc=' 'sha256-XsBu2nEJnS7x/Izq1v7dzy3Ze5myJMHvg4zukh/R1Yk=' 'sha256-AUCho1UyOpYFSZDg8EM9SYlysRIrUpQKZ7iE9CFSYfU=' 'sha256-vLlTaRFN8A2FPadIx711FwK9Ytd6LXkAzuEYAdC0D1k=' 'sha256-uM0I4me9aSUPORchT/KpGrvBQV6915H0JG2FGR5+BOs=' https://cdn.amplitude.com; object-src 'self'; connect-src 'self' https://hn.algolia.com",
     "web_accessible_resources": ["sidebar.html", "js/*.map", "js/generated/*.map", "js/generated/out/*"]
 }

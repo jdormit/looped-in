@@ -9,7 +9,7 @@
 (defn do-not-track
   "Returns true if Do Not Track is enabled"
   []
-  (= (.-doNotTrack js/navigator) 1))
+  (= (.-doNotTrack js/navigator) "1"))
 
 (defn init-amplitude
   "Injects the Amplitude bootstrapping script if DNT is disabled"
