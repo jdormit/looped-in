@@ -31,12 +31,14 @@
   "Logs an event to Amplitude. Returns a channel that resolves with the response from Amplitude"
   ([event-name properties]
    (let [res-channel (chan)]
-     (when (and (not (do-not-track)) (exists? js/amplitude))
-       (.logEvent (.getInstance js/amplitude)
-                  event-name
-                  (clj->js properties)
-                  (fn [response-code response-body]
-                    (go (>! res-channel {:code response-code
-                                         :body response-body})))))
+     (when (not (do-not-track))
+       (if-not (exists? js/amplitude)
+         (log/error "Unable to get Amplitude instance. Did you call init-amplitude?")
+         (.logEvent (.getInstance js/amplitude)
+                   event-name
+                   (clj->js properties)
+                   (fn [response-code response-body]
+                     (go (>! res-channel {:code response-code
+                                          :body response-body}))))))
      res-channel))
   ([event-name] (log-event event-name nil)))
