@@ -264,10 +264,10 @@
 (defn init
   "Initializes the sidebar"
   []
-  (analytics/init-amplitude)
-  (analytics/log-event "OPENED_SIDEBAR")
   (let [initial-state (update-state {:type :loading :loading true} (model))]
     (run-render-loop initial-state)
+    (analytics/init-amplitude)
+    (analytics/log-event "OPENED_SIDEBAR")
     (go (-> (fetch-hits)
             (<!)
             (#(update-state {:type :got-hits
