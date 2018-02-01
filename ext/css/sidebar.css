@@ -231,6 +231,10 @@ html, body {
     padding: 0;
 }
 
+pre {
+    overflow: scroll;
+}
+
 #sidebar {
     height: 100%;
     background-color: #ededf0;
