@@ -1,5 +1,8 @@
 (ns looped-in.analytics
-  (:require [goog.dom :as dom]))
+  (:require [goog.dom :as dom]
+            [cljs.core.async :refer [go chan <! >!]]
+            [looped-in.promises :refer [promise->channel]]
+            [looped-in.logging :as log]))
 
 (goog-define amplitude-api-key "FAKE_API_KEY")
 
@@ -16,4 +19,24 @@
   []
   (when (not (do-not-track))
     (dom/appendChild (.-body (dom/getDocument))
-                     (dom/createDom "script" (clj->js {}) amplitude-init-code))))
+                     (dom/createDom "script" nil amplitude-init-code))
+    (go (let [user-id (-> js/browser
+                          (.-runtime)
+                          (.sendMessage (clj->js {:type "getUserId"}))
+                          (promise->channel)
+                          (<!))]
+          (.setUserId (.getInstance js/amplitude) user-id)))))
+
+(defn log-event
+  "Logs an event to Amplitude. Returns a channel that resolves with the response from Amplitude"
+  ([event-name properties]
+   (let [res-channel (chan)]
+     (when (not (nil? js/amplitude))
+       (.logEvent (.getInstance js/amplitude)
+                  event-name
+                  (clj->js properties)
+                  (fn [response-code response-body]
+                    (go (>! res-channel {:code response-code
+                                         :body response-body})))))
+     res-channel))
+  ([event-name] (log-event event-name nil)))

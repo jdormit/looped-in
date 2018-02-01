@@ -102,7 +102,13 @@
                                    "div"
                                    "storyHeader"
                                    (components/body30 (:title current-item))
-                                   (components/item-link (:id current-item)))
+                                   (components/with-listener
+                                     (components/item-link (:id current-item))
+                                     "click"
+                                     (fn [e]
+                                       (analytics/log-event
+                                        "CLICKED_HN_EXTERNAL_LINK"
+                                        {:type "story"}))))
                                   (components/story-caption (:points current-item)
                                                             (:author current-item)
                                                             (* (:created_at_i current-item) 1000)))
@@ -113,7 +119,13 @@
                                      (components/comment-caption (:author current-item)
                                                                  (* (:created_at_i current-item)
                                                                     1000))
-                                     (components/item-link (:id current-item)))
+                                     (components/with-listener
+                                       (components/item-link (:id current-item))
+                                       "click"
+                                       (fn [e]
+                                         (analytics/log-event
+                                          "CLICKED_HN_EXTERNAL_LINK"
+                                          {:type "comment"}))))
                                     (components/comment-text (:text current-item))))
                        (map-indexed (fn [index child]
                                       (-> (components/card
@@ -123,7 +135,13 @@
                                             (components/comment-caption
                                              (:author child)
                                              (* (:created_at_i child) 1000))
-                                            (components/item-link (:id child)))
+                                            (components/with-listener
+                                              (components/item-link (:id child))
+                                              "click"
+                                              (fn [e]
+                                                (analytics/log-event
+                                                 "CLICKED_HN_EXTERNAL_LINK"
+                                                 {:type "comment"}))))
                                            (components/comment-text (:text child))
                                            (-> (components/replies-indicator
                                                 (count (:children child)))
@@ -134,6 +152,9 @@
                                                         (components/with-listener
                                                           "click"
                                                           (fn [e]
+                                                            (analytics/log-event
+                                                             "CLICKED_HN_VIEW_COMMENTS"
+                                                             {:depth (count (:depth state))})
                                                             (dispatch-message
                                                              {:type :enq-depth
                                                               :index index}))))
@@ -158,7 +179,13 @@
                                  "div"
                                  "storyHeader"
                                  (components/body30 (:title hit))
-                                 (components/item-link (:objectID hit)))
+                                 (components/with-listener
+                                   (components/item-link (:objectID hit))
+                                   "click"
+                                   (fn [e]
+                                     (analytics/log-event
+                                      "CLICKED_HN_EXTERNAL_LINK"
+                                      {:type "story"}))))
                                 (components/story-caption (:points hit)
                                                           (:author hit)
                                                           (* (:created_at_i hit) 1000))
@@ -170,6 +197,7 @@
                                              (components/with-listener
                                                "click"
                                                (fn [e]
+                                                 (analytics/log-event "CLICKED_HN_STORY")
                                                  (dispatch-message {:type :loading :loading true})
                                                  (go
                                                    (-> (fetch-item (:objectID hit))
@@ -197,19 +225,25 @@
       (dom/append $container $sidebar-dom))))
 
 (defn handle-close-button [e]
-  (.postMessage js/window.parent (clj->js {:type "closeSidebar"}) "*"))
+  (go (-> (analytics/log-event "CLOSED_SIDEBAR")
+          (<!)
+          ((fn [_]
+             (.postMessage js/window.parent (clj->js {:type "closeSidebar"}) "*"))))))
 
 (defn handle-events
   "Registers event listeners"
   [dispatch-message state]
   (events/listen (dom/getElement "closeSidebar") "click" handle-close-button)
   (when (not (nil? (dom/getElement "backButton")))
-      (events/listen (dom/getElement "backButton") "click" (fn [e]
-                                                          (let [depth (:depth state)]
-                                                            (if (> (count depth) 0)
-                                                              (dispatch-message {:type :deq-depth})
-                                                              (dispatch-message
-                                                               {:type :clear-item})))))))
+    (events/listen (dom/getElement "backButton")
+                   "click"
+                   (fn [e]
+                     (analytics/log-event "CLICKED_BACK_BUTTON" {:depth (count (:depth state))})
+                     (let [depth (:depth state)]
+                       (if (> (count depth) 0)
+                         (dispatch-message {:type :deq-depth})
+                         (dispatch-message
+                          {:type :clear-item})))))))
 
 (defn run-render-loop
   "Runs the model-update-view loop"
@@ -235,6 +269,7 @@
   "Initializes the sidebar"
   []
   (analytics/init-amplitude)
+  (analytics/log-event "OPENED_SIDEBAR")
   (let [initial-state (update-state {:type :loading :loading true} (model))]
     (run-render-loop initial-state)
     (go (-> (fetch-hits)
