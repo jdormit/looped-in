@@ -11,7 +11,7 @@ To build Looped In locally, you'll need [Leiningen](https://leiningen.org), the 
 
 To obtain a copy of the source code:
 
-    $ git clone git@github.com:jdormit/looped-in
+    $ git clone git@github.com:jdormit/looped-in.git
     
 To build the source code once, navigate to the project root and run:
 
