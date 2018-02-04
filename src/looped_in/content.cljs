@@ -47,7 +47,7 @@
 (defn handle-window-message [e]
   (let [msg (.-data (.getBrowserEvent e))]
     (case (.-type msg)
-     "closeSidebar" (close-sidebar))))
+      "closeSidebar" (close-sidebar))))
 
 (-> js/browser
     (.-runtime)
