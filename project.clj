@@ -1,8 +1,8 @@
-(defproject conversations-extension "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+(defproject conversations-extension "1.0.0"
+  :description "A browser extension that display Hackers News comments for the current web page"
+  :url "https://github.com/jdormit/looped-in"
+  :license {:name "GNU General Public License"
+            :url "https://www.gnu.org/licenses/gpl.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.946"]
                  [org.clojure/core.async "0.3.465"]
