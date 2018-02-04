@@ -31,7 +31,7 @@ If you are running the extension locally, you will either need to get an Amplitu
 (defn log-event []  ())
 ```
 
-If you want to keep the analytics, you'll need an Amplitude API key. [Sign up for Amplitude] (https://amplitude.com/signup?ref=nav) and follow the getting started guide to create a new project. Once you have the API key, create the file `profiles.clj` at the project root with the following content:
+If you want to keep the analytics, you'll need an Amplitude API key. [Sign up for Amplitude](https://amplitude.com/signup?ref=nav) and follow the getting started guide to create a new project. Once you have the API key, create the file `profiles.clj` at the project root with the following content:
 
 ```clojure
 {:provided [:cljs-shared
