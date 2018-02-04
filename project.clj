@@ -18,6 +18,7 @@
                             :pretty-print true
                             :source-map true
                             :output-dir "ext/js/generated/out"
+                            :closure-output-charset "us-ascii"
                             :modules {:background
                                       {:output-to "ext/js/generated/background.js"
                                        :entries #{"looped-in.background"}}
