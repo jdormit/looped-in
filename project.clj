@@ -9,6 +9,8 @@
                  [org.clojure/core.match "0.3.0-alpha5"]
                  [cljs-ajax "0.7.3"]]
   :plugins [[lein-cljsbuild "1.1.7"]]
+  :clean-targets ["ext/js/generated"]
+  :aliases {"build" ["do" "clean" ["cljsbuild" "once"]]}
   :profiles {:cljs-shared
              {:cljsbuild
               {:builds
