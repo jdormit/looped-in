@@ -22,7 +22,8 @@
             [looped-in.hackernews :as hn]
             [looped-in.components :as components]
             [looped-in.promises :refer [promise->channel]]
-            [looped-in.logging :as log]))
+            [looped-in.logging :as log]
+            [clojure.string :as string]))
 
 (enable-console-print!)
 
@@ -35,15 +36,31 @@
                   (.isArray js/Array v) (map obj->clj (array-seq v))
                   :default (js->clj v)))])))
 
-(defn sort-and-filter-item
-  [item]
+(defn filter-item [item]
   (assoc item :children
          (->> (:children item)
-              (filter #(contains? % :text))
-              (sort-by #(count (:children % [])) #(compare %2 %1))
+              (filter #(and (contains? % :text)
+                            (not (string/blank? (:text %)))))
               (map (fn [child]
                      (if (> (count (:children child)) 0)
-                       (sort-and-filter-item child)
+                       (filter-item child)
+                       child)))
+              (vec))))
+
+(defn get-total-children-count [item]
+  (if (= (count (:children item)) 0)
+    0
+    (apply +
+           (count (:children item))
+           (map get-total-children-count (:children item)))))
+
+(defn sort-item [item]
+  (assoc item :children
+         (->> (:children item)
+              (sort-by get-total-children-count #(compare %2 %1))
+              (map (fn [child]
+                     (if (> (count (:children child)) 0)
+                       (sort-item child)
                        child)))
               (vec))))
 
@@ -57,7 +74,8 @@
           (promise->channel)
           (<!)
           (obj->clj)
-          (sort-and-filter-item))))
+          (filter-item)
+          (sort-item))))
 
 (defn get-in-item
   "Retrieves the child from item represented by `depth`"
@@ -158,9 +176,7 @@
                                              (if (> (count (:children child)) 0)
                                                (components/with-classes card "clickable")
                                                card)))))
-                                    (->> (:children current-item)
-                                         (filter #(contains? % :text))
-                                         (sort-by #(count (:children %)) #(compare %2 %1))))))))
+                                    (:children current-item))))))
     (:hits state) (list
                    (components/sidebar-header (components/with-classes
                                                 (components/header-icon "icons/icon48.png")
