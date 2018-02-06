@@ -3,7 +3,7 @@
 
 Looped In is a browser extension that displays Hacker News comments for the current webpage in a sidebar. It is written in [ClojureScript](https://clojurescript.org).
 
-Looped In is available from the [Chrome Web Store](TODO) and the [Firefox Add-ons site](https://addons.mozilla.org/en-US/firefox/addon/looped-in). If you'd prefer to clone the repository and run the extension locally, read on.
+Looped In will be available from the Chrome Web Store and the Firefox Add-ons site pending review. If you'd prefer to clone the repository and run the extension locally, read on.
 
 ## Usage
 
