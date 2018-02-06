@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file. This change
 ## [1.1.0]
 ### Fixed
 - Pointed the Firefox Add-On Store link in the readme to the right URL.
-- Fixed project.clj so that the extension can be compiled with no additional profiles enabled>
+- Fixed project.clj so that the extension can be compiled with no additional profiles enabled.
 
 ### Removed
 - Removed all analytics and usage tracking.
