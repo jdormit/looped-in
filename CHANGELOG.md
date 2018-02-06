@@ -15,6 +15,6 @@ All notable changes to this project will be documented in this file. This change
 - Functionality to fetch and display Hacker News comments for the current URL.
 - Analytics through [Amplitude](https://amplitude.com).
 
-[Unreleased]:https://github.com/jdormit/looped-in/compare/v1.0.0...HEAD
+[Unreleased]:https://github.com/jdormit/looped-in/compare/v1.0.1...HEAD
 [1.0.0]: https://github.com/jdormit/looped-in/compare/9bf8d142c6a49b743da4b97574dfed0797dd5b2f...v1.0.0
 [1.0.1]: https://github.com/jdormit/looped-in/compare/v1.0.0...v1.0.1
