@@ -22,8 +22,7 @@
             [looped-in.hackernews :as hn]
             [looped-in.components :as components]
             [looped-in.promises :refer [promise->channel]]
-            [looped-in.logging :as log]
-            [looped-in.analytics :as analytics]))
+            [looped-in.logging :as log]))
 
 (enable-console-print!)
 
@@ -118,13 +117,7 @@
                                    "div"
                                    "storyHeader"
                                    (components/body30 (:title current-item))
-                                   (components/with-listener
-                                     (components/item-link (:id current-item))
-                                     "click"
-                                     (fn [e]
-                                       (analytics/log-event
-                                        "CLICKED_HN_EXTERNAL_LINK"
-                                        {:type "story"}))))
+                                   (components/item-link (:id current-item)))
                                   (components/story-caption (:points current-item)
                                                             (:author current-item)
                                                             (* (:created_at_i current-item) 1000)))
@@ -135,13 +128,7 @@
                                      (components/comment-caption (:author current-item)
                                                                  (* (:created_at_i current-item)
                                                                     1000))
-                                     (components/with-listener
-                                       (components/item-link (:id current-item))
-                                       "click"
-                                       (fn [e]
-                                         (analytics/log-event
-                                          "CLICKED_HN_EXTERNAL_LINK"
-                                          {:type "comment"}))))
+                                     (components/item-link (:id current-item)))
                                     (components/comment-text (:text current-item))))
                        (map-indexed (fn [index child]
                                       (-> (components/card
@@ -151,13 +138,7 @@
                                             (components/comment-caption
                                              (:author child)
                                              (* (:created_at_i child) 1000))
-                                            (components/with-listener
-                                              (components/item-link (:id child))
-                                              "click"
-                                              (fn [e]
-                                                (analytics/log-event
-                                                 "CLICKED_HN_EXTERNAL_LINK"
-                                                 {:type "comment"}))))
+                                            (components/item-link (:id child)))
                                            (components/comment-text (:text child))
                                            (-> (components/replies-indicator
                                                 (count (:children child)))
@@ -168,9 +149,6 @@
                                                         (components/with-listener
                                                           "click"
                                                           (fn [e]
-                                                            (analytics/log-event
-                                                             "CLICKED_HN_VIEW_COMMENTS"
-                                                             {:depth (count (:depth state))})
                                                             (dispatch-message
                                                              {:type :enq-depth
                                                               :index index}))))
@@ -195,13 +173,7 @@
                                  "div"
                                  "storyHeader"
                                  (components/body30 (:title hit))
-                                 (components/with-listener
-                                   (components/item-link (:objectID hit))
-                                   "click"
-                                   (fn [e]
-                                     (analytics/log-event
-                                      "CLICKED_HN_EXTERNAL_LINK"
-                                      {:type "story"}))))
+                                 (components/item-link (:objectID hit)))
                                 (components/story-caption (:points hit)
                                                           (:author hit)
                                                           (* (:created_at_i hit) 1000))
@@ -213,7 +185,6 @@
                                              (components/with-listener
                                                "click"
                                                (fn [e]
-                                                 (analytics/log-event "CLICKED_HN_STORY")
                                                  (dispatch-message {:type :loading :loading true})
                                                  (go
                                                    (-> (fetch-item (:objectID hit))
@@ -251,7 +222,6 @@
     (events/listen (dom/getElement "backButton")
                    "click"
                    (fn [e]
-                     (analytics/log-event "CLICKED_BACK_BUTTON" {:depth (count (:depth state))})
                      (let [depth (:depth state)]
                        (if (> (count depth) 0)
                          (dispatch-message {:type :deq-depth})
@@ -283,8 +253,6 @@
   []
   (let [initial-state (update-state {:type :loading :loading true} (model))]
     (run-render-loop initial-state)
-    (analytics/init-amplitude)
-    (analytics/log-event "OPENED_SIDEBAR")
     (go (-> (fetch-hits)
             (<!)
             (#(update-state {:type :got-hits
