@@ -3,11 +3,11 @@ All notable changes to this project will be documented in this file. This change
 
 ## [Unreleased]
 
-## [1.1.1]
+## [1.1.1] - 2018-02-06
 ### Changed
 - Comments are now sorted by total number of descendant comments, not just number of immediate children.
 
-## [1.1.0]
+## [1.1.0] - 2018-02-06
 ### Fixed
 - Pointed the Firefox Add-On Store link in the readme to the right URL.
 - Fixed project.clj so that the extension can be compiled with no additional profiles enabled.
@@ -15,7 +15,7 @@ All notable changes to this project will be documented in this file. This change
 ### Removed
 - Removed all analytics and usage tracking.
 
-## [1.0.1]
+## [1.0.1] - 2018-02-05
 ### Added
 - `lein build` alias to clean and compile JavaScript.
 
