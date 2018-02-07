@@ -1,4 +1,4 @@
-(defproject conversations-extension "1.1.1"
+(defproject conversations-extension "1.1.2"
   :description "A browser extension that display Hackers News comments for the current web page"
   :url "https://github.com/jdormit/looped-in"
   :license {:name "GNU General Public License"

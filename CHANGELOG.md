@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file. This change
 
 ## [Unreleased]
 
+## [1.1.2]
+### Changed
+- Revamped the whole build and package process to produce an artifact that meets Chrome and Firefox web store standards
+
+### Removed
+- Removed unecessary permission requests and the custom CSP from the extension manifest, now that the build process enables that
+
 ## [1.1.1] - 2018-02-06
 ### Changed
 - Comments are now sorted by total number of descendant comments, not just number of immediate children.
@@ -27,7 +34,8 @@ All notable changes to this project will be documented in this file. This change
 - Functionality to fetch and display Hacker News comments for the current URL.
 - Analytics through [Amplitude](https://amplitude.com).
 
-[Unreleased]:https://github.com/jdormit/looped-in/compare/v1.1.1...HEAD
+[Unreleased]:https://github.com/jdormit/looped-in/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/jdormit/looped-in/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/jdormit/looped-in/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/jdormit/looped-in/compare/v1.0.1...v1.0.0
 [1.0.1]: https://github.com/jdormit/looped-in/compare/v1.0.0...v1.0.1
