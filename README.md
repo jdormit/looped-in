@@ -7,7 +7,7 @@ Looped In will be available from the Chrome Web Store and the Firefox Add-ons si
 
 ## Usage
 
-To build Looped In locally, you'll need [Leiningen](https://leiningen.org) and [GNU Make](https://www.gnu.org/software/make)
+To build Looped In locally, you'll need [Leiningen](https://leiningen.org) and [GNU Make](https://www.gnu.org/software/make).
 
 To obtain a copy of the source code:
 
