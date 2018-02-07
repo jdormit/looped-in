@@ -9,26 +9,57 @@
                  [org.clojure/core.match "0.3.0-alpha5"]
                  [cljs-ajax "0.7.3"]]
   :plugins [[lein-cljsbuild "1.1.7"]]
-  :clean-targets ["ext/js/generated"]
-  :aliases {"build" ["do" "clean" ["cljsbuild" "once"]]}
-  :cljsbuild
-  {:builds
-   {:main
-    {:source-paths ["src"]
-     :compiler {:optimizations :simple
-                :pretty-print true
-                :source-map true
-                :output-dir "ext/js/generated/out"
-                :closure-output-charset "us-ascii"
-                :modules {:background
-                          {:output-to "ext/js/generated/background.js"
-                           :entries #{"looped-in.background"}}
-                          :content
-                          {:output-to "ext/js/generated/content.js"
-                           :entries #{"looped-in.content"}}
-                          :sidebar
-                          {:output-to "ext/js/generated/sidebar.js"
-                           :entries #{"looped-in.sidebar"}}}}}}}
-  :profiles {:dev {:dependencies [[com.cemerick/piggieback "0.2.2"]
-                                  [org.clojure/tools.nrepl "0.2.10"]]
-                   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}}})
+  :profiles {:cljs-shared
+             {:cljsbuild
+              {:builds
+               {:background
+                {:source-paths ["src/background" "src/lib"]
+                 :compiler {:output-dir "ext/js/generated/out-background"
+                            :closure-output-charset "us-ascii"
+                            :main looped-in.background
+                            :output-to "ext/js/generated/background.js"}}
+                :content
+                {:source-paths ["src/content" "src/lib"]
+                 :compiler {:output-dir "ext/js/generated/out-content"
+                            :closure-output-charset "us-ascii"
+                            :main looped-in.content
+                            :output-to "ext/js/generated/content.js"}}
+                :sidebar
+                {:source-paths ["src/sidebar" "src/lib"]
+                 :compiler {:output-dir "ext/js/generated/out-sidebar"
+                            :closure-output-charset "us-ascii"
+                            :main looped-in.sidebar
+                            :output-to "ext/js/generated/sidebar.js"}}}}}
+             :dev [:cljs-shared
+                   {:cljsbuild
+                    {:builds
+                     {:background
+                      {:compiler {:optimizations :whitespace
+                                  :pretty-print true
+                                  :source-map "ext/js/generated/background.js.map"}}
+                      :content
+                      {:compiler {:optimizations :whitespace
+                                  :pretty-print true
+                                  :source-map "ext/js/generated/content.js.map"}}
+                      :sidebar
+                      {:compiler {:optimizations :whitespace
+                                  :pretty-print true
+                                  :source-map "ext/js/generated/sidebar.js.map"}}}}}
+                   {:dependencies [[com.cemerick/piggieback "0.2.2"]
+                                   [org.clojure/tools.nrepl "0.2.10"]]
+                    :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}}]
+             :prod [:cljs-shared
+                    {:cljbuilds
+                     {:builds
+                      {:background
+                       {:compiler {:optimizations :simple
+                                   :pretty-print false
+                                   :source-map false}}
+                       :content
+                       {:compiler {:optimizations :simple
+                                   :pretty-print false
+                                   :source-map false}}
+                       :sidebar
+                       {:compiler {:optimizations :simple
+                                   :pretty-print false
+                                   :source-map false}}}}}]})

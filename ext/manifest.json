@@ -12,7 +12,6 @@
     "background": {
         "scripts": [
             "js/browser-polyfill.min.js",
-            "js/generated/out/cljs_base.js",
             "js/generated/background.js"
         ]
     },
@@ -25,7 +24,6 @@
             "matches": ["<all_urls>"],
             "js": [
                 "js/browser-polyfill.min.js",
-                "js/generated/out/cljs_base.js",
                 "js/generated/content.js"
             ]
         }
