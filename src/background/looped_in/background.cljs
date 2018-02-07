@@ -79,30 +79,11 @@
       (.sendMessage (.-id tab)
                     (clj->js {:type "openSidebar"}))))
 
-(defn get-user-id []
-  (go
-    (let [user-id (-> js/browser
-                      (.-storage)
-                      (.-local)
-                      (.get "userId")
-                      (promise->channel)
-                      (<!)
-                      (.-userId))]
-      (if (nil? user-id)
-        (let [uuid (.-uuid (random-uuid))]
-          (-> js/browser
-              (.-storage)
-              (.-local)
-              (.set (clj->js {"userId" uuid})))
-          uuid)
-        user-id))))
-
 (defn handle-message [msg sender respond]
   (case (.-type msg)
     "hits" (channel->promise (go @hits))
     "fetchItem" (channel->promise
-                 (go (clj->js (<! (hn/fetch-item (.-id msg))))))
-    "getUserId" (channel->promise (get-user-id))))
+                 (go (clj->js (<! (hn/fetch-item (.-id msg))))))))
 
 (-> js/browser
     (.-tabs)
