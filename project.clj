@@ -44,10 +44,7 @@
                       :sidebar
                       {:compiler {:optimizations :whitespace
                                   :pretty-print true
-                                  :source-map "ext/js/generated/sidebar.js.map"}}}}}
-                   {:dependencies [[com.cemerick/piggieback "0.2.2"]
-                                   [org.clojure/tools.nrepl "0.2.10"]]
-                    :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}}]
+                                  :source-map "ext/js/generated/sidebar.js.map"}}}}}]
              :prod [:cljs-shared
                     {:cljsbuild
                      {:builds
