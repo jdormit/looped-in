@@ -9,7 +9,7 @@ pom.xml.asc
 /.nrepl-port
 .hgignore
 .hg/
-ext/js/generated/
 .cljs_rhino_repl
-profiles.clj
 dist
+ext
+**/js/generated

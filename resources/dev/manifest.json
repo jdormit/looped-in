@@ -1,0 +1,31 @@
+{
+    "manifest_version": 2,
+    "name": "Looped In",
+    "version": "1.1.2",
+    "description": "Shows conversations on Hacker News about the current web page",
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "96": "icons/icon96.png",
+        "128": "icons/icon128.png"
+    },
+    "background": {
+        "page": "background.html"
+    },
+    "browser_action": {
+        "default_icon": "icons/icon48.png",
+        "default_title": "Looped In"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": [
+                "js/browser-polyfill.js",
+                "js/generated/content.js"
+            ]
+        }
+    ],
+    "content_security_policy": "script-src 'self' 'unsafe-eval' 'sha256-CfMPE8ys/ylJ5D9qKG0a9/UejrcczMr4/EmFCbVbgcc=' 'sha256-XsBu2nEJnS7x/Izq1v7dzy3Ze5myJMHvg4zukh/R1Yk=' 'sha256-AUCho1UyOpYFSZDg8EM9SYlysRIrUpQKZ7iE9CFSYfU=' 'sha256-vLlTaRFN8A2FPadIx711FwK9Ytd6LXkAzuEYAdC0D1k='; object-src 'self'",
+    "permissions": ["tabs", "https://hn.algolia.com/*"],
+    "web_accessible_resources": ["sidebar.html", "js/*.map", "js/generated/*.map", "js/generated/out/*"]
+}

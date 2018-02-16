@@ -14,49 +14,57 @@
               {:builds
                {:background
                 {:source-paths ["src/background" "src/lib"]
-                 :compiler {:output-dir "ext/js/generated/out-background"
-                            :closure-output-charset "us-ascii"
-                            :main looped-in.background
-                            :output-to "ext/js/generated/background.js"}}
+                 :compiler {:closure-output-charset "us-ascii"
+                            :main looped-in.background}}
                 :content
                 {:source-paths ["src/content" "src/lib"]
-                 :compiler {:output-dir "ext/js/generated/out-content"
-                            :closure-output-charset "us-ascii"
-                            :main looped-in.content
-                            :output-to "ext/js/generated/content.js"}}
+                 :compiler {:closure-output-charset "us-ascii"
+                            :main looped-in.content}}
                 :sidebar
                 {:source-paths ["src/sidebar" "src/lib"]
-                 :compiler {:output-dir "ext/js/generated/out-sidebar"
-                            :closure-output-charset "us-ascii"
-                            :main looped-in.sidebar
-                            :output-to "ext/js/generated/sidebar.js"}}}}}
+                 :compiler {:closure-output-charset "us-ascii"
+                            :main looped-in.sidebar}}}}}
              :dev [:cljs-shared
                    {:cljsbuild
                     {:builds
                      {:background
-                      {:compiler {:optimizations :whitespace
+                      {:compiler {:optimizations :none
+                                  :output-to "resources/dev/js/generated/background.js"
+                                  :output-dir "resources/dev/js/generated/out-background"
+                                  :asset-path "js/generated/out-background"
                                   :pretty-print true
-                                  :source-map "ext/js/generated/background.js.map"}}
+                                  :source-map true}}
                       :content
                       {:compiler {:optimizations :whitespace
+                                  :output-to "resources/dev/js/generated/content.js"
+                                  :output-dir "resources/dev/js/generated/out-content"
                                   :pretty-print true
-                                  :source-map "ext/js/generated/content.js.map"}}
+                                  :source-map "resources/dev/js/generated/content.js.map"}}
                       :sidebar
-                      {:compiler {:optimizations :whitespace
+                      {:compiler {:optimizations :none
+                                  :output-to "resources/dev/js/generated/sidebar.js"
+                                  :output-dir "resources/dev/js/generated/out-sidebar"
+                                  :asset-path "js/generated/out-sidebar"
                                   :pretty-print true
-                                  :source-map "ext/js/generated/sidebar.js.map"}}}}}]
+                                  :source-map true}}}}}]
              :prod [:cljs-shared
                     {:cljsbuild
                      {:builds
                       {:background
                        {:compiler {:optimizations :simple
+                                   :output-to "resources/prod/js/generated/background.js"
+                                   :output-dir "resources/prod/js/generated/out-background"
                                    :pretty-print false
                                    :source-map false}}
                        :content
                        {:compiler {:optimizations :simple
+                                   :output-to "resources/prod/js/generated/content.js"
+                                   :output-dir "resources/prod/js/generated/out-content"
                                    :pretty-print false
                                    :source-map false}}
                        :sidebar
                        {:compiler {:optimizations :simple
+                                   :output-to "resources/prod/js/generated/sidebar.js"
+                                   :output-dir "resources/prod/js/generated/out-sidebar"
                                    :pretty-print false
                                    :source-map false}}}}}]})

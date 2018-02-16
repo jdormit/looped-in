@@ -1,9 +1,12 @@
 dev :
 	lein cljsbuild once
-	rm -rf ext/js/generated/out-*
+	mkdir -p ext
+	cp -R resources/shared/* resources/dev/* ext/
 
 prod :
 	lein with-profile prod cljsbuild once
+	mkdir -p ext
+	cp -R resources/shared/* resources/prod/* ext/
 	rm -rf ext/js/generated/out-*
 
 package : clean prod
@@ -12,5 +15,7 @@ package : clean prod
 	mv ext/looped-in.zip dist
 
 clean :
-	rm -rf ext/js/generated
+	rm -rf resources/dev/js/generated
+	rm -rf resources/prod/js/generated
+	rm -rf ext
 	rm -rf dist
