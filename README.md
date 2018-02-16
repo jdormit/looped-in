@@ -13,11 +13,17 @@ To obtain a copy of the source code:
 
     $ git clone git@github.com:jdormit/looped-in.git
     
-To build the source code once, navigate to the project root and run:
+To build the source code, navigate to the project root and run:
 
-    $ make clean dev
+    $ make dev
 
-This will output the development build of the compiled extension to `ext`. The development build produces source maps and is significantly faster to compile. If you want a production build, run `make clean prod` instead.
+This will output a development build of the extension to `ext`. Additionally, it will start a [Figwheel](https://github.com/bhauman/lein-figwheel) session for the background and sidebar scripts, enabling live reloading and connecting a Clojurescript REPL to the sidebar script. Due to strict content security policy for content scripts, Figwheel cannot be enabled for the content script.
+
+If you want a production build instead, run:
+
+    $ make prod
+
+This will output an optimized production build of the extension to `ext`. The production build does not feature live reloading. It also takes significantly longer than the development build.
 
 To load the extension locally in your browser, see [instructions for Firefox](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Temporary_Installation_in_Firefox) or [instructions for Chrome](https://developer.chrome.com/extensions/getstarted#unpacked).
 

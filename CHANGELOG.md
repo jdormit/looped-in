@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file. This change
 ## [Unreleased]
 ### Changed
 - Refactored the directory structure and build process to enable separate development and production resources.
+- Enabled [Figwheel](https://github.com/bhauman/lein-figwheel) support for the development build.
 
 ## [1.1.2]
 ### Changed
