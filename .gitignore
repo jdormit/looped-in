@@ -13,3 +13,4 @@ pom.xml.asc
 dist
 ext
 **/js/generated
+figwheel_server.log

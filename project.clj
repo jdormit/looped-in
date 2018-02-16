@@ -28,43 +28,46 @@
                    {:cljsbuild
                     {:builds
                      {:background
-                      {:compiler {:optimizations :none
-                                  :output-to "resources/dev/js/generated/background.js"
-                                  :output-dir "resources/dev/js/generated/out-background"
+                      {:figwheel true
+                       :compiler {:optimizations :none
+                                  :output-to "ext/js/generated/background.js"
+                                  :output-dir "ext/js/generated/out-background"
                                   :asset-path "js/generated/out-background"
                                   :pretty-print true
                                   :source-map true}}
                       :content
                       {:compiler {:optimizations :whitespace
-                                  :output-to "resources/dev/js/generated/content.js"
-                                  :output-dir "resources/dev/js/generated/out-content"
+                                  :output-to "ext/js/generated/content.js"
+                                  :output-dir "ext/js/generated/out-content"
                                   :pretty-print true
-                                  :source-map "resources/dev/js/generated/content.js.map"}}
+                                  :source-map "ext/js/generated/content.js.map"}}
                       :sidebar
-                      {:compiler {:optimizations :none
-                                  :output-to "resources/dev/js/generated/sidebar.js"
-                                  :output-dir "resources/dev/js/generated/out-sidebar"
+                      {:figwheel true
+                       :compiler {:optimizations :none
+                                  :output-to "ext/js/generated/sidebar.js"
+                                  :output-dir "ext/js/generated/out-sidebar"
                                   :asset-path "js/generated/out-sidebar"
                                   :pretty-print true
-                                  :source-map true}}}}}]
+                                  :source-map true}}}}
+                    :plugins [[lein-figwheel "0.5.14"]]}]
              :prod [:cljs-shared
                     {:cljsbuild
                      {:builds
                       {:background
                        {:compiler {:optimizations :simple
-                                   :output-to "resources/prod/js/generated/background.js"
-                                   :output-dir "resources/prod/js/generated/out-background"
+                                   :output-to "ext/js/generated/background.js"
+                                   :output-dir "ext/js/generated/out-background"
                                    :pretty-print false
                                    :source-map false}}
                        :content
                        {:compiler {:optimizations :simple
-                                   :output-to "resources/prod/js/generated/content.js"
-                                   :output-dir "resources/prod/js/generated/out-content"
+                                   :output-to "ext/js/generated/content.js"
+                                   :output-dir "ext/js/generated/out-content"
                                    :pretty-print false
                                    :source-map false}}
                        :sidebar
                        {:compiler {:optimizations :simple
-                                   :output-to "resources/prod/js/generated/sidebar.js"
-                                   :output-dir "resources/prod/js/generated/out-sidebar"
+                                   :output-to "ext/js/generated/sidebar.js"
+                                   :output-dir "ext/js/generated/out-sidebar"
                                    :pretty-print false
                                    :source-map false}}}}}]})
