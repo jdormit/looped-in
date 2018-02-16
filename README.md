@@ -17,9 +17,15 @@ To build the source code once, navigate to the project root and run:
 
     $ make clean dev
 
-This will output the generated JavaScript to `ext/js/generated`.
+This will output the development build of the compiled extension to `ext`. The development build produces source maps and is significantly faster to compile. If you want a production build, run `make clean prod` instead.
 
 To load the extension locally in your browser, see [instructions for Firefox](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Temporary_Installation_in_Firefox) or [instructions for Chrome](https://developer.chrome.com/extensions/getstarted#unpacked).
+
+To package the extension for publication, run:
+
+    $ make package
+
+This will package a production build of the extension to `dist/looped-in.zip`.
 
 ## License
 

@@ -2,13 +2,15 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Refactored the directory structure and build process to enable separate development and production resources.
 
 ## [1.1.2]
 ### Changed
-- Revamped the whole build and package process to produce an artifact that meets Chrome and Firefox web store standards
+- Revamped the whole build and package process to produce an artifact that meets Chrome and Firefox web store standards.
 
 ### Removed
-- Removed unecessary permission requests and the custom CSP from the extension manifest, now that the build process enables that
+- Removed unecessary permission requests and the custom CSP from the extension manifest, now that the build process enables that.
 
 ## [1.1.1] - 2018-02-06
 ### Changed
