@@ -17,7 +17,7 @@ To build the source code, navigate to the project root and run:
 
     $ make dev
 
-This will output a development build of the extension to `ext`. Additionally, it will start a [Figwheel](https://github.com/bhauman/lein-figwheel) session for the background and sidebar scripts, enabling live reloading and connecting a Clojurescript REPL to the sidebar script. Due to strict content security policy for content scripts, Figwheel cannot be enabled for the content script.
+This will output a development build of the extension to `ext`. Additionally, it will start a [Figwheel](https://github.com/bhauman/lein-figwheel) session for the background and sidebar scripts, enabling live reloading and connecting a ClojureScript REPL to the sidebar script. Due to strict content security policy for content scripts, Figwheel cannot be enabled for the content script.
 
 If you want a production build instead, run:
 
