@@ -7,25 +7,57 @@ Looped In will be available from the Firefox Add-ons site and the Chrome Web Sto
 
 ## Usage
 
-To build Looped In locally, you'll need [Leiningen](https://leiningen.org) and [GNU Make](https://www.gnu.org/software/make).
-
 To obtain a copy of the source code:
 
     $ git clone git@github.com:jdormit/looped-in.git
     
+### Building
+
+To build Looped In locally, you'll need [Leiningen](https://leiningen.org) and [GNU Make](https://www.gnu.org/software/make).
+
 To build the source code, navigate to the project root and run:
 
     $ make dev
 
-This will output a development build of the extension to `ext`. Additionally, it will start a [Figwheel](https://github.com/bhauman/lein-figwheel) session for the background and sidebar scripts, enabling live reloading and connecting a ClojureScript REPL to the sidebar script. Due to the strict content security policy for content scripts, Figwheel cannot be enabled for the content script.
+This will output a development build of the extension to `ext`. 
 
 If you want a production build instead, run:
 
     $ make prod
 
-This will output an optimized production build of the extension to `ext`. The production build does not feature live reloading. It also takes significantly longer than the development build.
+This will output an optimized production build of the extension to `ext`.
 
 To load the extension locally in your browser, see [instructions for Firefox](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Temporary_Installation_in_Firefox) or [instructions for Chrome](https://developer.chrome.com/extensions/getstarted#unpacked).
+
+### Figwheel
+
+The development build of Looped In supports live-reloading of the background and sidebar scripts via [Figwheel](https://github.com/bhauman/lein-figwheel). You have two options for connecting to Figwheel: directly in the terminal or through Emacs via [CIDER](https://github.com/clojure-emacs/cider).
+
+#### Connecting to Figwheel from the terminal
+
+Spinning up Figwheel in the terminal is straightforward:
+
+    $ make fig
+
+This will compile a development build of the extension and attach a Figwheel REPL to the background script.
+
+#### Connecting to Figwheel through CIDER
+
+You'll need to install and configure [clojure-mode](https://github.com/clojure-emacs/clojure-mode) and [CIDER](https://github.com/clojure-emacs/cider). If you use [Spacemacs](https://spacemacs.org), just install the Clojure layer and you will be all set. 
+
+Before connecting to Figwheel from Emacs, make sure you have compiled a development build:
+
+    $ make dev
+
+The `.dir-locals.el` file configures Cider to start Figwheel when it launches a ClojureScript REPL. Launch a ClojureScript REPL with `M-x cider-jack-in-clojurescript`. Then switch to the REPL buffer with `M-x cider-switch-to-repl-buffer`.
+
+#### Switching builds in Figwheel
+
+Whether you use CIDER or the terminal, Figwheel will start connected to and live-reloading the background script. If you want to connect to and live-reload the sidebar script instead, run this command in the Figwheel REPL:
+
+    cljs.user> (switch-to-build sidebar)
+
+### Packaging
 
 To package the extension for publication, run:
 
