@@ -1,8 +1,13 @@
 dev : clean
 	mkdir -p ext
 	cp -R resources/shared/* resources/dev/* ext/
-	lein cljsbuild once content
-	lein figwheel background sidebar
+	lein cljsbuild once
+
+fig : clean
+	mkdir -p ext
+	cp -R resources/shared/* resources/dev/* ext/
+	lein cljsbuild once
+	lein figwheel
 
 prod : clean
 	mkdir -p ext
