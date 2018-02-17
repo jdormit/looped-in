@@ -49,7 +49,11 @@
                                   :asset-path "js/generated/out-sidebar"
                                   :pretty-print true
                                   :source-map true}}}}
-                    :plugins [[lein-figwheel "0.5.14"]]}]
+                    :dependencies [[com.cemerick/piggieback "0.2.2"]
+                                   [org.clojure/tools.nrepl "0.2.10"]
+                                   [figwheel-sidecar "0.5.14"]]
+                    :plugins [[lein-figwheel "0.5.14"]]
+                    :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}}]
              :prod [:cljs-shared
                     {:cljsbuild
                      {:builds
