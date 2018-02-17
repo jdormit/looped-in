@@ -84,30 +84,34 @@
     item
     (get-in-item (nth (:children item) fdepth) rdepth)))
 
-(defn model
-  "Returns initial sidebar state"
-  []
-  {:item nil
-   :hits nil
-   :depth []
-   :loading false})
+(defonce state
+  (atom {:item nil
+         :hits nil
+         :depth []
+         :loading false}))
 
 (defn update-state
-  "Given a message and the old state, returns the new state"
-  [msg state]
+  "Given a message, returns the new state"
+  [msg]
   (case (:type msg)
-    :got-item (-> state
-                  (assoc :item (:item msg))
-                  (assoc :loading false))
-    :got-hits (-> state
-                  (assoc :hits (:hits msg))
-                  (assoc :loading false))
-    :enq-depth (assoc state :depth (conj (:depth state) (:index msg)))
-    :deq-depth (assoc state :depth
-                      (subvec (:depth state) 0 (- (count (:depth state)) 1)))
-    :clear-item (assoc state :item nil)
-    :loading (assoc state :loading (:loading msg))
-    state))
+    :got-item (swap! state
+                     #(-> %
+                          (assoc :item (:item msg))
+                          (assoc :loading false)))
+    :got-hits (swap! state
+                     #(-> %
+                          (assoc :hits (:hits msg))
+                          (assoc :loading false)))
+    :enq-depth (swap! state
+                      #(assoc % :depth (conj (:depth @state) (:index msg))))
+    :deq-depth (swap! state
+                      #(assoc % :depth
+                              (subvec (:depth @state) 0 (- (count (:depth @state)) 1))))
+    :clear-item (swap! state
+                       #(assoc % :item nil))
+    :loading (swap! state
+                    #(assoc % :loading (:loading msg)))
+    @state))
 
 (defn view
   "Given a callback to dispatch an update message and the sidebar state, returns the sidebar DOM"
@@ -244,14 +248,17 @@
                          (dispatch-message
                           {:type :clear-item})))))))
 
+(declare run-render-loop)
+
+(defn dispatch-message [msg]
+  (let [new-state (update-state msg)]
+    (run-render-loop new-state)))
+
 (defn run-render-loop
   "Runs the model-update-view loop"
   [state]
-  (let [dispatch-message (fn [msg]
-                           (let [new-state (update-state msg state)]
-                             (run-render-loop new-state)))]
-    (render (view dispatch-message state))
-    (handle-events dispatch-message state)))
+  (render (view dispatch-message state))
+  (handle-events dispatch-message state))
 
 (defn fetch-hits
   "Fetch hits in the Algolia API matching the URL"
@@ -267,12 +274,12 @@
 (defn init
   "Initializes the sidebar"
   []
-  (let [initial-state (update-state {:type :loading :loading true} (model))]
+  (let [initial-state (update-state {:type :loading :loading true})]
     (run-render-loop initial-state)
     (go (-> (fetch-hits)
             (<!)
             (#(update-state {:type :got-hits
-                             :hits %} initial-state))
+                             :hits %}))
             (run-render-loop)))))
 
 (init)
