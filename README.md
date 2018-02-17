@@ -49,7 +49,7 @@ Before connecting to Figwheel from Emacs, make sure you have compiled a developm
 
     $ make dev
 
-The `.dir-locals.el` file configures Cider to start Figwheel when it launches a ClojureScript REPL. Launch a ClojureScript REPL with `M-x cider-jack-in-clojurescript`. Then switch to the REPL buffer with `M-x cider-switch-to-repl-buffer`.
+The `.dir-locals.el` file configures CIDER to start Figwheel when it launches a ClojureScript REPL. Launch a ClojureScript REPL with `M-x cider-jack-in-clojurescript`. Then switch to the REPL buffer with `M-x cider-switch-to-repl-buffer`.
 
 #### Switching builds in Figwheel
 
