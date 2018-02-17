@@ -113,9 +113,11 @@
                     #(assoc % :loading (:loading msg)))
     @state))
 
+(declare dispatch-message)
+
 (defn view
   "Given a callback to dispatch an update message and the sidebar state, returns the sidebar DOM"
-  [dispatch-message state]
+  [state]
   (cond
     (:loading state) (list (components/sidebar-header (components/with-classes
                                                         (components/header-icon "icons/icon48.png")
@@ -236,7 +238,7 @@
 
 (defn handle-events
   "Registers event listeners"
-  [dispatch-message state]
+  [state]
   (events/listen (dom/getElement "closeSidebar") "click" handle-close-button)
   (when (not (nil? (dom/getElement "backButton")))
     (events/listen (dom/getElement "backButton")
@@ -250,15 +252,17 @@
 
 (declare run-render-loop)
 
-(defn dispatch-message [msg]
+(defn dispatch-message
+  "Dispatches a message to change the state"
+  [msg]
   (let [new-state (update-state msg)]
     (run-render-loop new-state)))
 
 (defn run-render-loop
   "Runs the model-update-view loop"
   [state]
-  (render (view dispatch-message state))
-  (handle-events dispatch-message state))
+  (render (view state))
+  (handle-events state))
 
 (defn fetch-hits
   "Fetch hits in the Algolia API matching the URL"
