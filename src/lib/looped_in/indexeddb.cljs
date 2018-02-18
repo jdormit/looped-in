@@ -1,21 +1,21 @@
 (ns looped-in.indexeddb
-  (:require [cljs.core.async :refer [go chan >!]]
+  (:require [cljs.core.async :refer [go chan >! close!]]
    [looped-in.logging :as log]))
 
 (defn add-data
   "Adds data to IndexedDB"
   [db object-store data]
   (let [channel (chan)
-        transaction (.transaction db (clj->js [object-store]) "readwrite")
+        transaction (.transaction db (array object-store) "readwrite")
         store (.objectStore transaction object-store)
         data-coll (if (coll? data) data [data])]
     (doseq [datum data-coll]
       (.add store datum))
     (set! (.-onerror transaction)
           (fn [event] (log/error "Error adding data to IndexedDB: "
-                                 (.-errorCode (.-target event)))))
+                                 (.-message (.-error (.-target event))))))
     (set! (.-oncomplete transaction)
-          (fn [event] (go (>! channel (.-result (.-target event))))))
+          (fn [event] (close! channel)))
     channel))
 
 (defn get-data
@@ -23,14 +23,37 @@
   [db object-store index]
   (let [channel (chan)
         request (-> db
-                    (.transaction (clj->js [object-store]))
-                    (.objectStore objectStore)
+                    (.transaction (array object-store))
+                    (.objectStore object-store)
                     (.get index))]
     (set! (.-onerror request)
           (fn [event] (log/error "Error getting data from IndexedDB: "
-                                 (.-errorCode (.-target event)))))
+                                 (.-message (.-error (.-target event))))))
     (set! (.-onsuccess request)
-          (fn [event] (go (>! channel (.-result (.-target event))))))
+          (fn [event] (let [res (.-result (.-target event))]
+                        (if (nil? res) (close! channel) (go (>! channel res))))))
+    channel))
+
+(defn search-index
+  "Returns a channel of all data objects matching the index query.
+  The channel will contain multiple values if there are multiple matches."
+  [db object-store index query]
+  (let [channel (chan)
+        request (-> db
+                    (.transaction (array object-store))
+                    (.objectStore object-store)
+                    (.index index)
+                    (.openCursor query))]
+    (set! (.-onerror request)
+          (fn [event] (log/error "Error opening cursor into IndexedDB: "
+                                 (.-message (.-error (.-target event))))))
+    (set! (.-onsuccess request)
+          (fn [event]
+            (let [cursor (.-result (.-target event))]
+              (if (nil? cursor)
+                (close! channel)
+                (do (go (>! channel (.-value cursor)))
+                    (.continue cursor))))))
     channel))
 
 (defn update-data
@@ -40,19 +63,19 @@
   [db object-store index updated-values]
   (let [channel (chan)
         store (-> db
-                  (.transaction (clj->js [object-store]) "readwrite")
+                  (.transaction (array object-store) "readwrite")
                   (.objectStore object-store))
         get-request (.get store index)]
     (set! (.-onerror get-request)
           (fn [event] (log/error "Error getting data from IndexedDB: "
-                                 (.-errorCode (.-target event)))))
+                                 (.-message (.-error (.-target event))))))
     (set! (.-onsuccess get-request)
           (fn [event]
             (let [data (js->clj (.-result (.-target event)) :keywordize-keys true)
                   update-request (.put store (clj->js (merge data updated-values)))]
               (set! (.-onerror update-request)
                     (fn [event] (log/error "Error updating data in IndexedDB: "
-                                           (.-errorCode (.-target event)))))
+                                           (.-message (.-error (.-target event))))))
               (set! (.-onsuccess update-request)
                     (fn [event] (go (>! channel (.-result (.-target event)))))))))
     channel))
@@ -62,14 +85,14 @@
   [db object-store index]
   (let [channel (chan)
         request (-> db
-                    (.transaction (clj->js [object-store]) "readwrite")
+                    (.transaction (array object-store) "readwrite")
                     (.objectStore object-store)
                     (.delete index))]
-    (set! (.onerror request)
+    (set! (.-onerror request)
           (fn [event] (log/error "Error deleting data from IndexedDB: "
-                                 (.-errorCode (.-target event)))))
-    (set! (.onsuccess request)
-          (fn [event] (go (>! channel (.-result (.-target event))))))
+                                 (.-message (.-error (.-target event))))))
+    (set! (.-onsuccess request)
+          (fn [event] (close! channel)))
     channel))
 
 (defn open-database
@@ -81,10 +104,12 @@
          request (.open js/window.indexedDB name version)]
      (set! (.-onerror request)
            (fn [event] (log/error "Error opening IndexedDB: "
-                                  (.-errorCode (.-target event)))))
+                                  (.-message (.-error (.-target event))))))
      (set! (.-onsuccess request)
            (fn [event] (go (>! channel (.-result (.-target event))))))
      channel)))
+
+;; The problem is that clj->js is not camelCasing keys
 
 (defn create-database
   "Creates an IndexedDB database and returns a channel that resolves with a database instance.
@@ -99,7 +124,7 @@
      (set! (.-onerror request)
            (fn [event]
              (log/error "Error opening IndexedDB: "
-                        (.-errorCode (.-target event)))))
+                        (.-message (.-error (.-target event))))))
      (set! (.-onupgradeneeded request)
            (fn [event]
              (let [db (.-result (.-target event))]
@@ -107,9 +132,9 @@
                  (let [store (.createObjectStore db
                                                  (:name object-store)
                                                  (clj->js
-                                                  {:key-path
+                                                  {:keyPath
                                                    (:key-path object-store)
-                                                   :auto-increment
+                                                   :autoIncrement
                                                    (:auto-increment? object-store)}))]
                    (doseq [index (:indices object-store)]
                      (.createIndex store
@@ -117,11 +142,12 @@
                                    (:key-path index)
                                    (clj->js (:opts index)))))))))
      (set! (.-onsuccess request)
-           (go (>! channel (.-result (.-target event)))))
+           (fn [event]
+             (go (>! channel (.-result (.-target event))))))
      channel)))
 
 (defn create-object-store
-  "Creates an object store data structure.
+  "Creates an object store data structure for use with `looped-in.indexeddb/create-database`.
   `indices` is a sequence of index maps
   created via `looped-in.indexeddb/create-index`."
   ([store-name key-path]
@@ -133,7 +159,7 @@
 
 (defn create-index
   "Creates an index for use with `looped-in.indexeddb/create-object-store`.
-  `opts` is a map of options. Valid keys are :unique and :multi-entry, as
+  `opts` is a map of options. Valid keys are :unique and :multiEntry, as
   documented at https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore/createIndex."
   ([name]
    (create-index name name))
