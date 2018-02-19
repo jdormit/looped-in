@@ -16,7 +16,7 @@
 ;; along with Looped In.  If not, see <http://www.gnu.org/licenses/>.
 
 (ns looped-in.hackernews
-  (:require [cljs.core.async :refer [go go-loop >! chan close!]]
+  (:require [cljs.core.async :refer [go go-loop >! chan close! pipe]]
             [ajax.core :refer [GET]]
             [looped-in.logging :as log]))
 
@@ -54,3 +54,26 @@
       (if (nil? channel)
         acc
         (recur rest (conj acc (<! channel)))))))
+
+(defn get-max-item-id []
+  (let [channel (chan)]
+    (GET "https://hacker-news.firebaseio.com/v0/maxitem.json"
+         {:handler (fn [res] (go (>! channel res)))
+          :error-handler (fn [err]
+                           (log/error (str "Error fetching max item: " err))
+                           (close! channel))})
+    channel))
+
+(defn fetch-items-in-range-helper
+  [channel min-id max-id]
+  (if (= min-id max-id)
+    (do (close! channel)
+        channel)
+    (let [response-chan (fetch-item min-id)]
+      (pipe response-chan channel false)
+      (fetch-items-in-range-helper channel (inc min-id) max-id))))
+
+(defn fetch-items-in-range
+  "Returns a channel that will contain all items between min-id (inclusive) and max-id (exclusive)."
+  [min-id max-id]
+  (fetch-items-in-range-helper (chan) min-id max-id))

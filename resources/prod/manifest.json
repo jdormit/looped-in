@@ -28,6 +28,6 @@
             ]
         }
     ],
-    "permissions": ["tabs", "https://hn.algolia.com/*"],
+    "permissions": ["tabs", "https://hn.algolia.com/*", "https://hacker-news.firebaseio.com/*"],
     "web_accessible_resources": ["sidebar.html", "js/*.map", "js/generated/*.map", "js/generated/out/*"]
 }
