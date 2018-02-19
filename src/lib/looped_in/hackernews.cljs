@@ -67,8 +67,7 @@
 (defn fetch-items-in-range-helper
   [channel min-id max-id]
   (if (= min-id max-id)
-    (do (close! channel)
-        channel)
+    (close! channel)
     (let [response-chan (fetch-item min-id)]
       (pipe response-chan channel false)
       (fetch-items-in-range-helper channel (inc min-id) max-id))))
@@ -76,4 +75,6 @@
 (defn fetch-items-in-range
   "Returns a channel that will contain all items between min-id (inclusive) and max-id (exclusive)."
   [min-id max-id]
-  (fetch-items-in-range-helper (chan) min-id max-id))
+  (let [channel (chan)]
+    (fetch-items-in-range-helper channel min-id max-id)
+    channel))
