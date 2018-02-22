@@ -69,7 +69,7 @@
   (if (= min-id max-id)
     (close! channel)
     (let [response-chan (fetch-item min-id)]
-      (pipe response-chan channel false)
+      (go (>! channel (<! response-chan)))
       (fetch-items-in-range-helper channel (inc min-id) max-id))))
 
 (defn fetch-items-in-range
